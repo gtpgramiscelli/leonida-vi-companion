@@ -83,7 +83,7 @@ data class SecretLocation(
     val subtitle: String,
     val region: LeonidaRegion,
     val subArea: String,
-    /** Normalized [0f..1f] coordinates on the Leonida vector map */
+    /** Normalized [0f..1f] coordinates calibrated on the real Leonida atlas map */
     val mapX: Float,
     val mapY: Float,
     val category: SecretCategory,
@@ -92,6 +92,88 @@ data class SecretLocation(
     val howToFind: String,
     val reward: String
 )
+
+enum class MapLayerStyle(val label: String, val shortLabel: String) {
+    ATLAS("Atlas (Dia)", "Dia"),
+    DARK_ATLAS("Tático (Noite)", "Noite"),
+    SATELLITE("Satélite / Terreno", "Satélite")
+}
+
+enum class LandmarkKind(val label: String) {
+    REGION("Região"),
+    COUNTY("Condado"),
+    TOWN("Cidade"),
+    NEIGHBORHOOD("Bairro"),
+    ISLAND("Ilha / Key"),
+    AIRPORT("Aeroporto"),
+    WATER("Lago / Baía"),
+    LANDMARK("Marco"),
+    HIGHWAY("Rodovia")
+}
+
+data class MapLandmark(
+    val id: String,
+    val name: String,
+    val region: LeonidaRegion?,
+    val county: String? = null,
+    val kind: LandmarkKind,
+    val mapX: Float,
+    val mapY: Float,
+    val minZoom: Float = 1.0f,
+    val maxZoom: Float? = null,
+    val defaultZoom: Float? = null,
+    val subtitle: String = ""
+)
+
+data class MapLayerAsset(
+    val style: MapLayerStyle,
+    val assetPath: String,
+    val displayName: String = style.label,
+    val oceanColorHex: String? = null,
+    val isDarkLayer: Boolean = style == MapLayerStyle.DARK_ATLAS
+)
+
+data class MapAtlasManifest(
+    val imageWidth: Int,
+    val imageHeight: Int,
+    val metersPerPixel: Float = 6.4f,
+    val sourceAttribution: String,
+    val layers: List<MapLayerAsset>,
+    val secretCoordinates: Map<String, Pair<Float, Float>>,
+    val landmarks: List<MapLandmark>
+)
+
+sealed interface MapSearchResult {
+    val id: String
+    val title: String
+    val subtitle: String
+    val mapX: Float
+    val mapY: Float
+    val region: LeonidaRegion?
+
+    data class Secret(val location: SecretLocation) : MapSearchResult {
+        override val id: String get() = "secret_${location.id}"
+        override val title: String get() = location.title
+        override val subtitle: String get() = "${location.subArea} • ${location.region.displayName}"
+        override val mapX: Float get() = location.mapX
+        override val mapY: Float get() = location.mapY
+        override val region: LeonidaRegion get() = location.region
+    }
+
+    data class Place(val landmark: MapLandmark) : MapSearchResult {
+        override val id: String get() = "place_${landmark.id}"
+        override val title: String get() = landmark.name
+        override val subtitle: String
+            get() = listOfNotNull(
+                landmark.kind.label,
+                landmark.region?.displayName,
+                landmark.county
+            ).distinct().joinToString(" • ")
+        override val mapX: Float get() = landmark.mapX
+        override val mapY: Float get() = landmark.mapY
+        override val region: LeonidaRegion? get() = landmark.region
+    }
+}
 
 enum class CheatCategory(val label: String) {
     PLAYER("Jogador"),

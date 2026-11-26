@@ -11,8 +11,8 @@ android {
     applicationId = "com.leonida.gtavicompanion"
     minSdk = 26
     targetSdk = 36
-    versionCode = 3
-    versionName = "1.2.0"
+    versionCode = 4
+    versionName = "1.3.0"
 
     val defaultGithubRepo = (project.findProperty("leonida.githubRepo") as String?) ?: ""
     buildConfigField("String", "DEFAULT_GITHUB_REPO", "\"$defaultGithubRepo\"")
