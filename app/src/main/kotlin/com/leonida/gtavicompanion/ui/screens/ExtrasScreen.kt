@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
@@ -24,7 +25,6 @@ import androidx.compose.material.icons.rounded.Casino
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -51,21 +52,7 @@ import com.leonida.gtavicompanion.ui.components.ViceCard
 import com.leonida.gtavicompanion.ui.components.ViceHeroCard
 import com.leonida.gtavicompanion.ui.components.VicePillBadge
 import com.leonida.gtavicompanion.ui.components.ViceSectionHeader
-import com.leonida.gtavicompanion.ui.theme.ViceCardSurface
-import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
-import com.leonida.gtavicompanion.ui.theme.ViceElevatedSurface
-import com.leonida.gtavicompanion.ui.theme.ViceMidnight
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.ViceOutline
-import com.leonida.gtavicompanion.ui.theme.ViceOutlineSoft
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.VicePurpleGlow
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetGold
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetOrange
-import com.leonida.gtavicompanion.ui.theme.ViceTextMuted
-import com.leonida.gtavicompanion.ui.theme.ViceTextPrimary
-import com.leonida.gtavicompanion.ui.theme.ViceTextSecondary
+import com.leonida.gtavicompanion.ui.theme.LeonidaTheme
 
 private enum class ExtrasTab(val label: String) {
     FUN_FACTS("Fun Facts"),
@@ -78,6 +65,7 @@ fun ExtrasScreen(
     state: UserProgressState,
     viewModel: CompanionViewModel
 ) {
+    val colors = LeonidaTheme.colors
     var selectedTab by remember { mutableStateOf(ExtrasTab.FUN_FACTS) }
     var spotlightIndex by remember { mutableIntStateOf(0) }
 
@@ -89,7 +77,7 @@ fun ExtrasScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ViceMidnight)
+            .background(colors.background)
     ) {
         // Segmented top tabs
         Row(
@@ -97,22 +85,24 @@ fun ExtrasScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(ViceDeepSurface)
-                .border(1.dp, ViceOutline, RoundedCornerShape(16.dp))
+                .background(colors.chipBg)
+                .border(1.dp, colors.outline, RoundedCornerShape(16.dp))
                 .padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             ExtrasTab.entries.forEach { tab ->
                 val isSelected = tab == selectedTab
+                val tabShape = RoundedCornerShape(12.dp)
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (isSelected) ViceElevatedSurface else Color.Transparent)
+                        .then(if (isSelected && !colors.isDark) Modifier.shadow(2.dp, tabShape) else Modifier)
+                        .clip(tabShape)
+                        .background(if (isSelected) colors.card else Color.Transparent)
                         .border(
                             width = if (isSelected) 1.dp else 0.dp,
-                            color = if (isSelected) ViceNeonPink.copy(alpha = 0.7f) else Color.Transparent,
-                            shape = RoundedCornerShape(12.dp)
+                            color = if (isSelected) colors.pink.copy(alpha = 0.6f) else Color.Transparent,
+                            shape = tabShape
                         )
                         .clickable { selectedTab = tab }
                         .padding(vertical = 9.dp),
@@ -121,7 +111,7 @@ fun ExtrasScreen(
                     Text(
                         text = tab.label,
                         style = MaterialTheme.typography.labelLarge,
-                        color = if (isSelected) ViceTextPrimary else ViceTextMuted
+                        color = if (isSelected) colors.textPrimary else colors.textMuted
                     )
                 }
             }
@@ -141,11 +131,15 @@ fun ExtrasScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                VicePillBadge(text = "CURIOSIDADE EM DESTAQUE", color = ViceSunsetGold)
+                                VicePillBadge(
+                                    text = "CURIOSIDADE EM DESTAQUE",
+                                    color = Color(0xFFFFD166),
+                                    onHero = true
+                                )
                                 Text(
                                     text = "${state.seenFunFactIds.size}/${GtaViCatalog.funFacts.size} vistos",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = VicePalmMint
+                                    color = Color(0xFF3BF0B8)
                                 )
                             }
                             Spacer(Modifier.height(10.dp))
@@ -153,19 +147,19 @@ fun ExtrasScreen(
                                 Text(
                                     text = spotlightFact.title,
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = ViceTextPrimary
+                                    color = colors.heroTextPrimary
                                 )
                                 Spacer(Modifier.height(6.dp))
                                 Text(
                                     text = spotlightFact.summary,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = ViceTextSecondary
+                                    color = colors.heroTextSecondary
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = "Onde conferir: ${spotlightFact.whereToSpot}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = ViceOceanCyan
+                                    color = Color(0xFF00E5FF)
                                 )
                             }
                             Spacer(Modifier.height(12.dp))
@@ -173,7 +167,7 @@ fun ExtrasScreen(
                                 onClick = { spotlightIndex = (spotlightIndex + 1) % maxOf(availableFacts.size, 1) },
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = ViceNeonPink,
+                                    containerColor = Color(0xFFFF2E93),
                                     contentColor = Color.White
                                 )
                             ) {
@@ -189,43 +183,43 @@ fun ExtrasScreen(
                         val isLocked = fact.minChapter > state.currentChapter && state.currentChapter < 6
 
                         if (isLocked) {
-                            ViceCard(accentBorder = ViceOutline, backgroundColor = ViceDeepSurface) {
+                            ViceCard(accentBorder = colors.outline, backgroundColor = colors.card) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
-                                    Icon(Icons.Rounded.Lock, contentDescription = null, tint = ViceTextMuted)
+                                    Icon(Icons.Rounded.Lock, contentDescription = null, tint = colors.textMuted)
                                     Column {
                                         Text(
                                             text = "Curiosidade do Capítulo ${fact.minChapter}+",
                                             style = MaterialTheme.typography.titleSmall,
-                                            color = ViceTextSecondary
+                                            color = colors.textSecondary
                                         )
                                         Text(
                                             text = "Protegida pelo Escudo Anti-Spoiler até você chegar lá.",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = ViceTextMuted
+                                            color = colors.textMuted
                                         )
                                     }
                                 }
                             }
                         } else {
                             ViceCard(
-                                accentBorder = if (isSeen) VicePalmMint.copy(alpha = 0.45f) else VicePurpleGlow.copy(alpha = 0.35f)
+                                accentBorder = if (isSeen) colors.mint.copy(alpha = 0.5f) else colors.purple.copy(alpha = 0.35f)
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    VicePillBadge(text = fact.tag, color = VicePurpleGlow)
+                                    VicePillBadge(text = fact.tag, color = colors.purple)
                                     Row(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(50))
-                                            .background(if (isSeen) VicePalmMint.copy(alpha = 0.18f) else ViceMidnight)
+                                            .background(if (isSeen) colors.mintSoft else colors.chipBg)
                                             .border(
                                                 1.dp,
-                                                if (isSeen) VicePalmMint else ViceOutline,
+                                                if (isSeen) colors.mint else colors.outline,
                                                 RoundedCornerShape(50)
                                             )
                                             .clickable { viewModel.toggleFunFactSeen(fact.id) }
@@ -236,13 +230,13 @@ fun ExtrasScreen(
                                         Icon(
                                             imageVector = if (isSeen) Icons.Rounded.CheckCircle else Icons.Rounded.AutoAwesome,
                                             contentDescription = null,
-                                            tint = if (isSeen) VicePalmMint else ViceTextMuted,
+                                            tint = if (isSeen) colors.mint else colors.textMuted,
                                             modifier = Modifier.size(14.dp)
                                         )
                                         Text(
                                             text = if (isSeen) "Já vi no jogo!" else "Marcar visto",
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = if (isSeen) VicePalmMint else ViceTextSecondary
+                                            color = if (isSeen) colors.mint else colors.textSecondary
                                         )
                                     }
                                 }
@@ -250,20 +244,20 @@ fun ExtrasScreen(
                                 Text(
                                     text = fact.title,
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = ViceTextPrimary,
+                                    color = colors.textPrimary,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
                                     text = fact.summary,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = ViceTextSecondary
+                                    color = colors.textSecondary
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = "Onde encontrar: ${fact.whereToSpot}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = ViceOceanCyan
+                                    color = colors.cyan
                                 )
                             }
                         }
@@ -279,10 +273,10 @@ fun ExtrasScreen(
                     }
                     items(GtaViCatalog.dailyTips, key = { it.id }) { tip ->
                         val color = when (tip.badge) {
-                            "Alerta Crítico" -> ViceNeonPink
-                            "100% Sem Dor" -> VicePalmMint
-                            "Combate" -> ViceSunsetOrange
-                            else -> ViceOceanCyan
+                            "Alerta Crítico" -> colors.pink
+                            "100% Sem Dor" -> colors.mint
+                            "Combate" -> colors.orange
+                            else -> colors.cyan
                         }
                         ViceCard(accentBorder = color.copy(alpha = 0.42f)) {
                             Row(
@@ -296,13 +290,13 @@ fun ExtrasScreen(
                             Text(
                                 text = tip.title,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = ViceTextPrimary
+                                color = colors.textPrimary
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 text = tip.body,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = ViceTextSecondary
+                                color = colors.textSecondary
                             )
                         }
                     }
@@ -317,22 +311,27 @@ fun ExtrasScreen(
                     }
                     items(GtaViCatalog.characters, key = { it.id }) { char ->
                         val locked = char.minChapter > state.currentChapter && state.currentChapter < 6
+                        val regColor = char.region.accent(colors)
                         if (locked) {
-                            ViceCard(accentBorder = ViceOutline, backgroundColor = ViceDeepSurface) {
+                            ViceCard(accentBorder = colors.outline, backgroundColor = colors.card) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
-                                    Icon(Icons.Rounded.Lock, contentDescription = null, tint = ViceTextMuted)
+                                    Icon(Icons.Rounded.Lock, contentDescription = null, tint = colors.textMuted)
                                     Text(
                                         text = "Personagem apresentado no Capítulo ${char.minChapter} (protegido)",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = ViceTextMuted
+                                        color = colors.textMuted
                                     )
                                 }
                             }
                         } else {
-                            ViceCard(accentBorder = char.region.accent.copy(alpha = 0.45f)) {
+                            val initials = char.name.split(" ")
+                                .take(2)
+                                .mapNotNull { it.firstOrNull()?.uppercaseChar() }
+                                .joinToString("")
+                            ViceCard(accentBorder = regColor.copy(alpha = 0.45f)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
@@ -340,29 +339,45 @@ fun ExtrasScreen(
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                        modifier = Modifier.weight(1f)
                                     ) {
-                                        Icon(Icons.Rounded.Person, contentDescription = null, tint = char.region.accent)
+                                        Box(
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .clip(CircleShape)
+                                                .background(regColor.copy(alpha = if (colors.isDark) 0.18f else 0.13f))
+                                                .border(1.dp, regColor.copy(alpha = 0.55f), CircleShape),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = initials,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                color = regColor,
+                                                fontWeight = FontWeight.Black
+                                            )
+                                        }
                                         Column {
                                             Text(
                                                 text = char.name,
                                                 style = MaterialTheme.typography.titleMedium,
-                                                color = ViceTextPrimary
+                                                color = colors.textPrimary
                                             )
                                             Text(
                                                 text = char.role,
                                                 style = MaterialTheme.typography.bodySmall,
-                                                color = char.region.accent
+                                                color = regColor
                                             )
                                         }
                                     }
-                                    VicePillBadge(text = char.region.displayName, color = char.region.accent)
+                                    Spacer(Modifier.width(8.dp))
+                                    VicePillBadge(text = char.region.displayName, color = regColor)
                                 }
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = char.bio,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = ViceTextSecondary
+                                    color = colors.textSecondary
                                 )
                             }
                         }
@@ -376,9 +391,10 @@ fun ExtrasScreen(
                         )
                     }
                     items(LeonidaRegion.entries, key = { it.name }) { region ->
+                        val regColor = region.accent(colors)
                         ViceCard(
-                            accentBorder = region.accent.copy(alpha = 0.45f),
-                            backgroundColor = ViceCardSurface
+                            accentBorder = regColor.copy(alpha = 0.45f),
+                            backgroundColor = colors.card
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -389,17 +405,17 @@ fun ExtrasScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Icon(Icons.Rounded.Public, contentDescription = null, tint = region.accent)
+                                    Icon(Icons.Rounded.Public, contentDescription = null, tint = regColor)
                                     Column {
                                         Text(
                                             text = region.displayName,
                                             style = MaterialTheme.typography.titleMedium,
-                                            color = ViceTextPrimary
+                                            color = colors.textPrimary
                                         )
                                         Text(
                                             text = "${region.county} • ${region.cardinal}",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = region.accent
+                                            color = regColor
                                         )
                                     }
                                 }
@@ -408,7 +424,7 @@ fun ExtrasScreen(
                             Text(
                                 text = region.vibe,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = ViceTextSecondary
+                                color = colors.textSecondary
                             )
                         }
                     }

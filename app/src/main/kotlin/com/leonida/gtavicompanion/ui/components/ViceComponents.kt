@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Shield
@@ -31,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -38,36 +40,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.leonida.gtavicompanion.model.CheatDirection
 import com.leonida.gtavicompanion.model.PlatformType
-import com.leonida.gtavicompanion.ui.theme.ViceCardSurface
-import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
-import com.leonida.gtavicompanion.ui.theme.ViceElevatedSurface
-import com.leonida.gtavicompanion.ui.theme.ViceMidnight
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.ViceOutline
-import com.leonida.gtavicompanion.ui.theme.ViceOutlineSoft
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetGold
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetOrange
-import com.leonida.gtavicompanion.ui.theme.ViceTextMuted
-import com.leonida.gtavicompanion.ui.theme.ViceTextPrimary
-import com.leonida.gtavicompanion.ui.theme.ViceTextSecondary
+import com.leonida.gtavicompanion.ui.theme.LeonidaTheme
 
 @Composable
 fun ViceCard(
     modifier: Modifier = Modifier,
-    accentBorder: Color = ViceOutlineSoft,
-    backgroundColor: Color = ViceCardSurface,
+    accentBorder: Color = LeonidaTheme.colors.outlineSoft,
+    backgroundColor: Color = LeonidaTheme.colors.card,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = RoundedCornerShape(20.dp)
+    val colors = LeonidaTheme.colors
+    val shape = RoundedCornerShape(22.dp)
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier),
         shape = shape,
         color = backgroundColor,
+        shadowElevation = if (colors.isDark) 0.dp else 3.dp,
         border = BorderStroke(1.dp, accentBorder)
     ) {
         Column(
@@ -82,34 +73,53 @@ fun ViceHeroCard(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val shape = RoundedCornerShape(24.dp)
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF2B1046),
-                        Color(0xFF1A1136),
-                        Color(0xFF0E1F38)
+    val colors = LeonidaTheme.colors
+    val shape = RoundedCornerShape(26.dp)
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        color = Color.Transparent,
+        shadowElevation = if (colors.isDark) 4.dp else 8.dp
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(colors.heroStart, colors.heroMid, colors.heroEnd)
                     )
                 )
-            )
-            .border(
-                width = 1.2.dp,
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        ViceNeonPink.copy(alpha = 0.7f),
-                        ViceSunsetOrange.copy(alpha = 0.45f),
-                        ViceOceanCyan.copy(alpha = 0.7f)
+                .drawBehind {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color(0x55FF8A3D),
+                                Color(0x28FF2E93),
+                                Color.Transparent
+                            ),
+                            center = Offset(size.width * 0.92f, size.height * 0.12f),
+                            radius = size.maxDimension * 0.65f
+                        ),
+                        radius = size.maxDimension * 0.65f,
+                        center = Offset(size.width * 0.92f, size.height * 0.12f)
                     )
-                ),
-                shape = shape
-            )
-            .padding(18.dp)
-    ) {
-        Column(content = content)
+                }
+                .border(
+                    width = 1.dp,
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0x99FF2E93),
+                            Color(0x66FF8A3D),
+                            Color(0x8800E5FF)
+                        )
+                    ),
+                    shape = shape
+                )
+                .padding(18.dp)
+        ) {
+            Column(content = content)
+        }
     }
 }
 
@@ -117,13 +127,25 @@ fun ViceHeroCard(
 fun VicePillBadge(
     text: String,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onHero: Boolean = false
 ) {
+    val colors = LeonidaTheme.colors
+    val bg = when {
+        onHero -> colors.heroOverlayChipBg
+        colors.isDark -> color.copy(alpha = 0.16f)
+        else -> color.copy(alpha = 0.12f)
+    }
+    val borderCol = when {
+        onHero -> color.copy(alpha = 0.72f)
+        colors.isDark -> color.copy(alpha = 0.45f)
+        else -> color.copy(alpha = 0.36f)
+    }
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(50))
-            .background(color.copy(alpha = 0.16f))
-            .border(1.dp, color.copy(alpha = 0.48f), RoundedCornerShape(50))
+            .background(bg)
+            .border(1.dp, borderCol, RoundedCornerShape(50))
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
@@ -141,6 +163,7 @@ fun ViceSectionHeader(
     trailing: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val colors = LeonidaTheme.colors
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -150,14 +173,14 @@ fun ViceSectionHeader(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                color = ViceTextPrimary
+                color = colors.textPrimary
             )
             if (subtitle != null) {
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextSecondary
+                    color = colors.textSecondary
                 )
             }
         }
@@ -174,29 +197,33 @@ fun DirectionSequenceRow(
     directions: List<CheatDirection>,
     modifier: Modifier = Modifier
 ) {
+    val colors = LeonidaTheme.colors
     FlowRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+        verticalArrangement = Arrangement.spacedBy(7.dp)
     ) {
         directions.forEach { dir ->
-            val accent = when (dir) {
-                CheatDirection.UP -> ViceOceanCyan
-                CheatDirection.DOWN -> ViceNeonPink
-                CheatDirection.LEFT -> ViceSunsetGold
-                CheatDirection.RIGHT -> VicePalmMint
-            }
+            val accent = dir.accent(colors)
+            val keyShape = RoundedCornerShape(11.dp)
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(ViceMidnight)
-                    .border(1.2.dp, accent.copy(alpha = 0.65f), RoundedCornerShape(10.dp))
-                    .padding(horizontal = 9.dp, vertical = 6.dp),
+                    .then(
+                        if (colors.isDark) Modifier else Modifier.shadow(1.5.dp, keyShape)
+                    )
+                    .clip(keyShape)
+                    .background(colors.chipBg)
+                    .border(
+                        width = 1.2.dp,
+                        color = accent.copy(alpha = if (colors.isDark) 0.65f else 0.55f),
+                        shape = keyShape
+                    )
+                    .padding(horizontal = 10.dp, vertical = 7.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
                         text = dir.arrow,
@@ -207,7 +234,7 @@ fun DirectionSequenceRow(
                     Text(
                         text = dir.ptName.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = ViceTextPrimary.copy(alpha = 0.85f)
+                        color = colors.textPrimary.copy(alpha = 0.9f)
                     )
                 }
             }
@@ -219,8 +246,10 @@ fun DirectionSequenceRow(
 fun ChapterProgressSelector(
     currentChapter: Int,
     onSelectChapter: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onHero: Boolean = false
 ) {
+    val colors = LeonidaTheme.colors
     val options = listOf(
         0 to "Prólogo",
         1 to "Cap. 1",
@@ -230,6 +259,9 @@ fun ChapterProgressSelector(
         5 to "Cap. 5",
         6 to "Pós-Game"
     )
+    val shieldTint = if (onHero) Color(0xFF3BF0B8) else colors.mint
+    val labelTint = if (onHero) colors.heroTextSecondary else colors.textSecondary
+
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -238,13 +270,13 @@ fun ChapterProgressSelector(
             Icon(
                 imageVector = Icons.Rounded.Shield,
                 contentDescription = null,
-                tint = VicePalmMint,
+                tint = shieldTint,
                 modifier = Modifier.size(16.dp)
             )
             Text(
                 text = "Escudo Anti-Spoiler — Onde você está na história:",
                 style = MaterialTheme.typography.labelMedium,
-                color = ViceTextSecondary
+                color = labelTint
             )
         }
         Spacer(Modifier.height(10.dp))
@@ -256,10 +288,14 @@ fun ChapterProgressSelector(
         ) {
             options.forEach { (value, label) ->
                 val selected = value == currentChapter
+                val unselectedBg = if (onHero) colors.heroOverlayChipBg else colors.chipBg
+                val unselectedBorder = if (onHero) Color.White.copy(alpha = 0.24f) else colors.outline
+                val unselectedText = if (onHero) colors.heroTextSecondary else colors.textSecondary
+
                 val bg = if (selected) {
-                    Brush.horizontalGradient(listOf(ViceNeonPink, ViceSunsetOrange))
+                    Brush.horizontalGradient(listOf(Color(0xFFFF2E93), Color(0xFFFF8A3D)))
                 } else {
-                    Brush.horizontalGradient(listOf(ViceDeepSurface, ViceDeepSurface))
+                    Brush.horizontalGradient(listOf(unselectedBg, unselectedBg))
                 }
                 Box(
                     modifier = Modifier
@@ -267,7 +303,7 @@ fun ChapterProgressSelector(
                         .background(bg)
                         .border(
                             width = 1.dp,
-                            color = if (selected) Color.Transparent else ViceOutline,
+                            color = if (selected) Color.White.copy(alpha = 0.35f) else unselectedBorder,
                             shape = RoundedCornerShape(12.dp)
                         )
                         .clickable { onSelectChapter(value) }
@@ -276,7 +312,7 @@ fun ChapterProgressSelector(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelMedium,
-                        color = if (selected) Color.White else ViceTextSecondary
+                        color = if (selected) Color.White else unselectedText
                     )
                 }
             }
@@ -288,13 +324,21 @@ fun ChapterProgressSelector(
 fun PlatformSwitcher(
     selected: PlatformType,
     onSelect: (PlatformType) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onHero: Boolean = false
 ) {
+    val colors = LeonidaTheme.colors
+    val containerBg = if (onHero) colors.heroOverlayChipBg else colors.chipBg
+    val containerBorder = if (onHero) Color.White.copy(alpha = 0.24f) else colors.outline
+    val activeText = if (onHero) Color(0xFF00E5FF) else colors.cyan
+    val inactiveText = if (onHero) colors.heroTextSecondary else colors.textMuted
+    val activeBg = if (onHero) Color.White.copy(alpha = 0.16f) else colors.card
+
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(ViceMidnight)
-            .border(1.dp, ViceOutline, RoundedCornerShape(14.dp))
+            .background(containerBg)
+            .border(1.dp, containerBorder, RoundedCornerShape(14.dp))
             .padding(3.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -303,31 +347,21 @@ fun PlatformSwitcher(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(11.dp))
-                    .background(if (isSelected) ViceElevatedSurface else Color.Transparent)
+                    .background(if (isSelected) activeBg else Color.Transparent)
                     .border(
                         width = if (isSelected) 1.dp else 0.dp,
-                        color = if (isSelected) ViceOceanCyan.copy(alpha = 0.7f) else Color.Transparent,
+                        color = if (isSelected) activeText.copy(alpha = 0.7f) else Color.Transparent,
                         shape = RoundedCornerShape(11.dp)
                     )
                     .clickable { onSelect(platform) }
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .padding(horizontal = 11.dp, vertical = 6.dp)
             ) {
                 Text(
                     text = platform.label,
                     style = MaterialTheme.typography.labelMedium,
-                    color = if (isSelected) ViceOceanCyan else ViceTextMuted
+                    color = if (isSelected) activeText else inactiveText
                 )
             }
         }
     }
-}
-
-@Composable
-fun NeonDot(color: Color, sizeDp: Int = 8) {
-    Box(
-        modifier = Modifier
-            .size(sizeDp.dp)
-            .clip(CircleShape)
-            .background(color)
-    )
 }

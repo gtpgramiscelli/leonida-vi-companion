@@ -1,18 +1,7 @@
 package com.leonida.gtavicompanion.model
 
 import androidx.compose.ui.graphics.Color
-import com.leonida.gtavicompanion.ui.theme.RegionAmbrosia
-import com.leonida.gtavicompanion.ui.theme.RegionGrassrivers
-import com.leonida.gtavicompanion.ui.theme.RegionLeonidaKeys
-import com.leonida.gtavicompanion.ui.theme.RegionMountKalaga
-import com.leonida.gtavicompanion.ui.theme.RegionPortGellhorn
-import com.leonida.gtavicompanion.ui.theme.RegionViceCity
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.VicePurpleGlow
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetGold
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetOrange
+import com.leonida.gtavicompanion.ui.theme.LeonidaColors
 
 enum class PlatformType(val label: String, val holdButton: String, val tapButton: String) {
     PS5("PS5", "L1", "R1"),
@@ -23,59 +12,69 @@ enum class LeonidaRegion(
     val displayName: String,
     val county: String,
     val cardinal: String,
-    val vibe: String,
-    val accent: Color
+    val vibe: String
 ) {
     VICE_CITY(
         displayName = "Vice City",
         county = "Vice-Dale County",
         cardinal = "Costa Leste",
-        vibe = "Neon, praias Art Déco, arranha-céus e submundo urbano inspirado em Miami.",
-        accent = RegionViceCity
+        vibe = "Neon, praias Art Déco, arranha-céus e submundo urbano inspirado em Miami."
     ),
     LEONIDA_KEYS(
         displayName = "Leonida Keys",
         county = "Mariana County",
         cardinal = "Extremo Sul",
-        vibe = "Arquipélago tropical ligado por pontes oceânicas, contrabando e vida náutica.",
-        accent = RegionLeonidaKeys
+        vibe = "Arquipélago tropical ligado por pontes oceânicas, contrabando e vida náutica."
     ),
     GRASSRIVERS(
         displayName = "Grassrivers",
         county = "Mariana County",
         cardinal = "Centro-Sul",
-        vibe = "Pântanos densos estilo Everglades, aerobarcos, jacarés e trilhas enlameadas.",
-        accent = RegionGrassrivers
+        vibe = "Pântanos densos estilo Everglades, aerobarcos, jacarés e trilhas enlameadas."
     ),
     PORT_GELLHORN(
         displayName = "Port Gellhorn",
         county = "Kelly County",
         cardinal = "Costa Oeste",
-        vibe = "Cidade portuária industrial na costa do Golfo, motéis decadentes e corridas.",
-        accent = RegionPortGellhorn
+        vibe = "Cidade portuária industrial na costa do Golfo, motéis decadentes e corridas."
     ),
     AMBROSIA(
         displayName = "Ambrosia",
         county = "Leonard County",
         cardinal = "Interior Central",
-        vibe = "Coração rural e industrial ao redor do Lago Leonida, canaviais e refinarias.",
-        accent = RegionAmbrosia
+        vibe = "Coração rural e industrial ao redor do Lago Leonida, canaviais e refinarias."
     ),
     MOUNT_KALAGA(
         displayName = "Mount Kalaga",
         county = "Lummox County",
         cardinal = "Extremo Norte",
-        vibe = "Montanhas florestadas, Parque Nacional, cânions, trilhas e exploração off-road.",
-        accent = RegionMountKalaga
-    )
+        vibe = "Montanhas florestadas, Parque Nacional, cânions, trilhas e exploração off-road."
+    );
+
+    fun accent(colors: LeonidaColors): Color = when (this) {
+        VICE_CITY -> colors.pink
+        LEONIDA_KEYS -> colors.cyan
+        GRASSRIVERS -> colors.mint
+        PORT_GELLHORN -> colors.orange
+        AMBROSIA -> colors.gold
+        MOUNT_KALAGA -> colors.purple
+    }
 }
 
-enum class SecretCategory(val label: String, val color: Color) {
-    PARANORMAL("Paranormal & Criptídeos", VicePurpleGlow),
-    EASTER_EGG("Easter Eggs & TV", ViceNeonPink),
-    VEHICLE_MILITARY("Veículos & Militar", ViceSunsetOrange),
-    COLLECTIBLE("Segredos & Rádio", ViceOceanCyan),
-    ROCKSTAR_NOD("Clássicos Rockstar", ViceSunsetGold)
+enum class SecretCategory(val label: String) {
+    PARANORMAL("Paranormal & Criptídeos"),
+    EASTER_EGG("Easter Eggs & TV"),
+    VEHICLE_MILITARY("Veículos & Militar"),
+    COLLECTIBLE("Segredos & Rádio"),
+    ROCKSTAR_NOD("Clássicos Rockstar");
+
+    fun accent(colors: LeonidaColors): Color = when (this) {
+        PARANORMAL -> colors.purple
+        EASTER_EGG -> colors.pink
+        VEHICLE_MILITARY -> colors.orange
+        COLLECTIBLE -> colors.cyan
+        ROCKSTAR_NOD -> colors.gold
+    }
 }
 
 data class SecretLocation(
@@ -94,19 +93,34 @@ data class SecretLocation(
     val reward: String
 )
 
-enum class CheatCategory(val label: String, val color: Color) {
-    PLAYER("Jogador", ViceOceanCyan),
-    COMBAT("Combate", ViceNeonPink),
-    VEHICLE("Veículos", ViceSunsetOrange),
-    ENVIRONMENT("Mundo & Clima", VicePalmMint),
-    FILTER("Filtros de Tela", VicePurpleGlow)
+enum class CheatCategory(val label: String) {
+    PLAYER("Jogador"),
+    COMBAT("Combate"),
+    VEHICLE("Veículos"),
+    ENVIRONMENT("Mundo & Clima"),
+    FILTER("Filtros de Tela");
+
+    fun accent(colors: LeonidaColors): Color = when (this) {
+        PLAYER -> colors.cyan
+        COMBAT -> colors.pink
+        VEHICLE -> colors.orange
+        ENVIRONMENT -> colors.mint
+        FILTER -> colors.purple
+    }
 }
 
 enum class CheatDirection(val arrow: String, val ptName: String) {
     UP("↑", "Cima"),
     DOWN("↓", "Baixo"),
     LEFT("←", "Esq"),
-    RIGHT("→", "Dir")
+    RIGHT("→", "Dir");
+
+    fun accent(colors: LeonidaColors): Color = when (this) {
+        UP -> colors.cyan
+        DOWN -> colors.pink
+        LEFT -> colors.gold
+        RIGHT -> colors.mint
+    }
 }
 
 data class CheatCode(
@@ -134,22 +148,25 @@ data class StoryChapter(
     val gameplayTips: List<String>
 )
 
-enum class ChecklistCategory(val label: String, val subtitle: String, val color: Color) {
+enum class ChecklistCategory(val label: String, val subtitle: String) {
     STORY_TASKS(
         "História & Empreitadas",
-        "12 requisitos de campanha, golpes e receptação",
-        ViceNeonPink
+        "12 requisitos de campanha, golpes e receptação"
     ),
     EXPLORATION_ACTIVITIES(
         "Exploração & Atividades",
-        "20 requisitos de minigames, corridas e desafios",
-        ViceOceanCyan
+        "20 requisitos de minigames, corridas e desafios"
     ),
     DISCOVERY(
         "Descoberta & Catálogo",
-        "3 requisitos de mapa, WAiNK e fauna",
-        VicePalmMint
-    )
+        "3 requisitos de mapa, WAiNK e fauna"
+    );
+
+    fun accent(colors: LeonidaColors): Color = when (this) {
+        STORY_TASKS -> colors.pink
+        EXPLORATION_ACTIVITIES -> colors.cyan
+        DISCOVERY -> colors.mint
+    }
 }
 
 data class ChecklistItem(
@@ -185,11 +202,18 @@ data class CharacterProfile(
     val minChapter: Int
 )
 
-enum class TrophyTier(val label: String, val color: Color) {
-    PLATINUM("Platina", ViceOceanCyan),
-    GOLD("Ouro", ViceSunsetGold),
-    SILVER("Prata", Color(0xFFD4D8E8)),
-    BRONZE("Bronze", ViceSunsetOrange)
+enum class TrophyTier(val label: String) {
+    PLATINUM("Platina"),
+    GOLD("Ouro"),
+    SILVER("Prata"),
+    BRONZE("Bronze");
+
+    fun accent(colors: LeonidaColors): Color = when (this) {
+        PLATINUM -> colors.cyan
+        GOLD -> colors.gold
+        SILVER -> colors.silver
+        BRONZE -> colors.orange
+    }
 }
 
 data class Ps5Trophy(

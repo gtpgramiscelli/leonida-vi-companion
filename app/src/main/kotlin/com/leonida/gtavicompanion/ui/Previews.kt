@@ -1,5 +1,6 @@
 package com.leonida.gtavicompanion.ui
 
+import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.leonida.gtavicompanion.data.ProgressRepository
@@ -30,7 +31,8 @@ private class PreviewProgressRepository(
     }
 }
 
-@Preview(showBackground = true, widthDp = 412, heightDp = 915, name = "Dashboard 100%")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Home — Claro")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Home — Escuro")
 @Composable
 fun HomeScreenPreview() {
     val vm = CompanionViewModel(PreviewProgressRepository())
@@ -45,7 +47,8 @@ fun HomeScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 412, heightDp = 915, name = "Mapa Interativo de Leonida")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Mapa — Claro")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Mapa — Escuro")
 @Composable
 fun MapScreenPreview() {
     val vm = CompanionViewModel(PreviewProgressRepository())
@@ -54,7 +57,8 @@ fun MapScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 412, heightDp = 915, name = "Cheats GTA VI")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Cheats — Claro")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Cheats — Escuro")
 @Composable
 fun CheatsScreenPreview() {
     val vm = CompanionViewModel(PreviewProgressRepository())
@@ -63,7 +67,8 @@ fun CheatsScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 412, heightDp = 915, name = "Capítulos Anti-Spoiler")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Capítulos — Claro")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Capítulos — Escuro")
 @Composable
 fun ChaptersScreenPreview() {
     val vm = CompanionViewModel(PreviewProgressRepository())
@@ -72,7 +77,8 @@ fun ChaptersScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 412, heightDp = 915, name = "Fun Facts e Dicas")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Extras — Claro")
+@Preview(showBackground = true, widthDp = 412, heightDp = 915, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Extras — Escuro")
 @Composable
 fun ExtrasScreenPreview() {
     val vm = CompanionViewModel(PreviewProgressRepository())

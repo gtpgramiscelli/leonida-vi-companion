@@ -30,7 +30,7 @@ class LeonidaAppTest {
             }
         }
 
-        composeRule.onNodeWithText("LEONIDA COMPANION").assertIsDisplayed()
+        composeRule.onNodeWithText("LEONIDA VI").assertIsDisplayed()
         composeRule.onNodeWithText("História").performClick()
         composeRule.onNodeWithText("Capítulo 2 — Protegido").assertIsDisplayed()
         composeRule.onNodeWithText("Cheats").performClick()

@@ -38,7 +38,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
@@ -60,6 +60,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -71,6 +72,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -90,19 +92,7 @@ import com.leonida.gtavicompanion.ui.components.ViceCard
 import com.leonida.gtavicompanion.ui.components.ViceHeroCard
 import com.leonida.gtavicompanion.ui.components.VicePillBadge
 import com.leonida.gtavicompanion.ui.components.ViceSectionHeader
-import com.leonida.gtavicompanion.ui.theme.ViceCardSurface
-import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
-import com.leonida.gtavicompanion.ui.theme.ViceMidnight
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.ViceOutline
-import com.leonida.gtavicompanion.ui.theme.ViceOutlineSoft
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetGold
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetOrange
-import com.leonida.gtavicompanion.ui.theme.ViceTextMuted
-import com.leonida.gtavicompanion.ui.theme.ViceTextPrimary
-import com.leonida.gtavicompanion.ui.theme.ViceTextSecondary
+import com.leonida.gtavicompanion.ui.theme.LeonidaTheme
 import java.io.File
 
 @Composable
@@ -111,6 +101,7 @@ fun SyncScreen(
     viewModel: CompanionViewModel,
     onClose: () -> Unit
 ) {
+    val colors = LeonidaTheme.colors
     val context = LocalContext.current
     val syncState by viewModel.syncState.collectAsStateWithLifecycle()
 
@@ -174,44 +165,51 @@ fun SyncScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ViceMidnight)
-            .statusBarsPadding()
+            .background(colors.background)
             .navigationBarsPadding()
     ) {
-        // Top Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(ViceDeepSurface)
-                .padding(horizontal = 8.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = colors.surface,
+            shadowElevation = if (colors.isDark) 0.dp else 4.dp
         ) {
-            IconButton(onClick = onClose) {
-                Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
-                    contentDescription = "Voltar",
-                    tint = ViceTextPrimary
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Sincronização PS5",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = ViceTextPrimary
-                )
-                Text(
-                    text = "Troféus PSN + Scanner de Câmera na TV (Soma Automática)",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = ViceOceanCyan
-                )
+            Column(modifier = Modifier.statusBarsPadding()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onClose) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Voltar",
+                            tint = colors.textPrimary
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Sincronização PS5",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = colors.textPrimary
+                        )
+                        Text(
+                            text = "Troféus PSN + Scanner de Câmera na TV (Soma Automática)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.cyan
+                        )
+                    }
+                }
+                if (colors.isDark) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(colors.outlineSoft)
+                    )
+                }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(ViceOutlineSoft)
-        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -226,24 +224,28 @@ fun SyncScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        VicePillBadge(text = "SOMA CUMULATIVA • PS5", color = VicePalmMint)
+                        VicePillBadge(
+                            text = "SOMA CUMULATIVA • PS5",
+                            color = Color(0xFF3BF0B8),
+                            onHero = true
+                        )
                         Text(
                             text = "${state.unlockedTrophyIds.size}/${viewModel.totalMappedTrophiesCount} marcos • ${state.cameraScansCount} scans",
                             style = MaterialTheme.typography.labelSmall,
-                            color = ViceTextSecondary
+                            color = colors.heroTextSecondary
                         )
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = "Precisão Máxima na Sua Jogatina",
                         style = MaterialTheme.typography.titleLarge,
-                        color = ViceTextPrimary
+                        color = colors.heroTextPrimary
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text = "O app soma tudo automaticamente: seus troféus do PS5 + fotos dos menus na TV + prints do PlayStation App + suas marcações manuais. Nada que você já conquistou é apagado.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ViceTextSecondary
+                        color = colors.heroTextSecondary
                     )
                     if (state.lastSyncSummary.isNotBlank()) {
                         Spacer(Modifier.height(10.dp))
@@ -251,34 +253,34 @@ fun SyncScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(ViceMidnight.copy(alpha = 0.72f))
-                                .border(1.dp, VicePalmMint.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                                .background(colors.heroOverlayChipBg)
+                                .border(1.dp, Color(0xFF3BF0B8).copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                                 .padding(10.dp)
                         ) {
                             Text(
                                 text = "Última sincronização: ${state.lastSyncSummary}",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = VicePalmMint
+                                color = Color(0xFF3BF0B8)
                             )
                         }
                     }
                 }
             }
 
-            // 2. LIVE SYNC / OCR FEEDBACK CARD (Preview Confirmation, Progress, or Result)
+            // 2. LIVE SYNC / OCR FEEDBACK CARD
             item {
                 when (val s = syncState) {
                     SyncUiState.Idle -> Unit
 
                     SyncUiState.ScanningOcr, SyncUiState.SyncingPsn -> {
-                        ViceCard(accentBorder = ViceOceanCyan.copy(alpha = 0.6f)) {
+                        ViceCard(accentBorder = colors.cyan.copy(alpha = 0.6f)) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(22.dp),
-                                    color = ViceOceanCyan,
+                                    color = colors.cyan,
                                     strokeWidth = 2.5.dp
                                 )
                                 Text(
@@ -288,7 +290,7 @@ fun SyncScreen(
                                         "Consultando perfil público PSN..."
                                     },
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = ViceTextPrimary
+                                    color = colors.textPrimary
                                 )
                             }
                         }
@@ -296,27 +298,27 @@ fun SyncScreen(
 
                     is SyncUiState.PreviewDetection -> {
                         val det = s.detection
-                        ViceCard(accentBorder = VicePalmMint.copy(alpha = 0.75f)) {
+                        ViceCard(accentBorder = colors.mint.copy(alpha = 0.75f)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                VicePillBadge(text = "LEITURA RECONHECIDA!", color = VicePalmMint)
-                                Text(det.sourceLabel, style = MaterialTheme.typography.labelSmall, color = ViceTextMuted)
+                                VicePillBadge(text = "LEITURA RECONHECIDA!", color = colors.mint)
+                                Text(det.sourceLabel, style = MaterialTheme.typography.labelSmall, color = colors.textMuted)
                             }
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 text = "Confira o que encontramos na tela:",
                                 style = MaterialTheme.typography.titleSmall,
-                                color = ViceTextPrimary
+                                color = colors.textPrimary
                             )
                             Spacer(Modifier.height(6.dp))
                             det.highlights.forEach { bullet ->
                                 Text(
                                     text = "• $bullet",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = VicePalmMint
+                                    color = colors.mint
                                 )
                             }
                             if (!det.rawOcrText.isNullOrBlank()) {
@@ -324,7 +326,7 @@ fun SyncScreen(
                                 Text(
                                     text = if (showRawOcrText) "Ocultar texto lido" else "Ver texto bruto lido pela câmera",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = ViceOceanCyan,
+                                    color = colors.cyan,
                                     modifier = Modifier.clickable { showRawOcrText = !showRawOcrText }
                                 )
                                 AnimatedVisibility(visible = showRawOcrText) {
@@ -333,13 +335,13 @@ fun SyncScreen(
                                             .padding(top = 6.dp)
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(10.dp))
-                                            .background(ViceMidnight)
+                                            .background(colors.chipBg)
                                             .padding(8.dp)
                                     ) {
                                         Text(
                                             text = det.rawOcrText.take(600),
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = ViceTextMuted
+                                            color = colors.textMuted
                                         )
                                     }
                                 }
@@ -354,7 +356,7 @@ fun SyncScreen(
                                     modifier = Modifier.weight(0.85f),
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
-                                    Text("Descartar", color = ViceTextSecondary)
+                                    Text("Descartar", color = colors.textSecondary)
                                 }
                                 Button(
                                     onClick = {
@@ -363,8 +365,8 @@ fun SyncScreen(
                                     modifier = Modifier.weight(1.3f),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = VicePalmMint,
-                                        contentColor = ViceMidnight
+                                        containerColor = colors.mint,
+                                        contentColor = Color.White
                                     )
                                 ) {
                                     Icon(Icons.Rounded.CheckCircle, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -376,7 +378,7 @@ fun SyncScreen(
                     }
 
                     is SyncUiState.AppliedSuccess -> {
-                        ViceCard(accentBorder = VicePalmMint.copy(alpha = 0.7f)) {
+                        ViceCard(accentBorder = colors.mint.copy(alpha = 0.7f)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -386,21 +388,21 @@ fun SyncScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = VicePalmMint)
-                                    Text(s.title, style = MaterialTheme.typography.titleSmall, color = VicePalmMint)
+                                    Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = colors.mint)
+                                    Text(s.title, style = MaterialTheme.typography.titleSmall, color = colors.mint)
                                 }
                                 TextButton(onClick = { viewModel.dismissSyncFeedback() }) {
-                                    Text("OK", color = ViceTextSecondary)
+                                    Text("OK", color = colors.textSecondary)
                                 }
                             }
                             s.changes.forEach { ch ->
-                                Text("• $ch", style = MaterialTheme.typography.bodySmall, color = ViceTextPrimary)
+                                Text("• $ch", style = MaterialTheme.typography.bodySmall, color = colors.textPrimary)
                             }
                         }
                     }
 
                     is SyncUiState.InfoMessage -> {
-                        ViceCard(accentBorder = ViceSunsetGold.copy(alpha = 0.6f)) {
+                        ViceCard(accentBorder = colors.gold.copy(alpha = 0.6f)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -411,37 +413,37 @@ fun SyncScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Icon(Icons.Rounded.Info, contentDescription = null, tint = ViceSunsetGold)
-                                    Text(s.title, style = MaterialTheme.typography.titleSmall, color = ViceSunsetGold)
+                                    Icon(Icons.Rounded.Info, contentDescription = null, tint = colors.gold)
+                                    Text(s.title, style = MaterialTheme.typography.titleSmall, color = colors.gold)
                                 }
                                 TextButton(onClick = { viewModel.dismissSyncFeedback() }) {
-                                    Text("Fechar", color = ViceTextSecondary)
+                                    Text("Fechar", color = colors.textSecondary)
                                 }
                             }
                             Spacer(Modifier.height(4.dp))
-                            Text(s.message, style = MaterialTheme.typography.bodySmall, color = ViceTextSecondary)
+                            Text(s.message, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
                         }
                     }
                 }
             }
 
-            // 3. OPÇÃO 1: CÂMERA NA TV + PRINT DO PS APP (COM INSTRUÇÕES DETALHADAS!)
+            // 3. OPÇÃO 1: CÂMERA NA TV + PRINT DO PS APP
             item {
                 ViceSectionHeader(
                     title = "1. Scanner pela Câmera na TV (OCR)",
                     subtitle = "Lê contadores exatos e troféus direto da TV ou de prints do PS App — 100% offline"
                 )
                 Spacer(Modifier.height(10.dp))
-                ViceCard(accentBorder = ViceNeonPink.copy(alpha = 0.45f)) {
+                ViceCard(accentBorder = colors.pink.copy(alpha = 0.45f)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Rounded.Tv, contentDescription = null, tint = ViceNeonPink, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Rounded.Tv, contentDescription = null, tint = colors.pink, modifier = Modifier.size(20.dp))
                         Text(
                             text = "Como usar a câmera para máxima precisão:",
                             style = MaterialTheme.typography.titleSmall,
-                            color = ViceNeonPink
+                            color = colors.pink
                         )
                     }
                     Spacer(Modifier.height(10.dp))
@@ -450,21 +452,21 @@ fun SyncScreen(
                         number = "1",
                         title = "Qual menu abrir no seu PS5",
                         detail = "• Progresso & Contadores: aperte Options no DualSense → Progresso → Estatísticas / 100% / História (lê capítulo, WAiNK, animais, Stick Ups, estande de tiro, bancos e gangues).\n• Troféus: aperte o Botão PS → Troféus → Grand Theft Auto VI (ou tire um print no PlayStation App no celular!).",
-                        accent = ViceOceanCyan
+                        accent = colors.cyan
                     )
                     Spacer(Modifier.height(8.dp))
                     InstructionStep(
                         number = "2",
                         title = "Enquadre a TV sem reflexo",
                         detail = "Fique de frente para a TV a uns 60–100 cm, mantenha a lista dentro da moldura neon da câmera e deixe o flash DESLIGADO (o flash dá clarão na tela e atrapalha a leitura).",
-                        accent = ViceSunsetGold
+                        accent = colors.gold
                     )
                     Spacer(Modifier.height(8.dp))
                     InstructionStep(
                         number = "3",
                         title = "Pode escanear várias abas seguidas!",
                         detail = "Cada foto soma com a anterior e com seus troféus PSN. O app sempre mostra uma prévia do que leu antes de somar ao seu progresso.",
-                        accent = VicePalmMint
+                        accent = colors.mint
                     )
 
                     if (cameraPermissionDenied) {
@@ -472,7 +474,7 @@ fun SyncScreen(
                         Text(
                             text = "Permissão de câmera negada. Libere a câmera nas configurações do Android ou use o botão \"Importar Print (PS App)\" abaixo.",
                             style = MaterialTheme.typography.bodySmall,
-                            color = ViceSunsetOrange
+                            color = colors.orange
                         )
                     }
 
@@ -484,7 +486,7 @@ fun SyncScreen(
                             .height(50.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = ViceNeonPink,
+                            containerColor = colors.pink,
                             contentColor = Color.White
                         )
                     ) {
@@ -508,37 +510,37 @@ fun SyncScreen(
                         Icon(
                             Icons.Rounded.PhotoLibrary,
                             contentDescription = null,
-                            tint = ViceOceanCyan,
+                            tint = colors.cyan,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
                             "Importar Print do PS App / Galeria",
                             style = MaterialTheme.typography.labelLarge,
-                            color = ViceOceanCyan
+                            color = colors.cyan
                         )
                     }
                 }
             }
 
-            // 4. OPÇÃO 2: SINCRONIZAÇÃO DE TROFÉUS PSN (PS5)
+            // 4. OPÇÃO 2: SINCRONIZAÇÃO DE TROFÉUS PSN
             item {
                 ViceSectionHeader(
                     title = "2. Sincronização de Troféus PS5 (PSN)",
                     subtitle = "Conecta sua PSN ID pública e também permite marcar troféus com soma automática"
                 )
                 Spacer(Modifier.height(10.dp))
-                ViceCard(accentBorder = ViceOceanCyan.copy(alpha = 0.45f)) {
+                ViceCard(accentBorder = colors.cyan.copy(alpha = 0.45f)) {
                     Text(
                         text = "Sua PSN Online ID (Perfil Público)",
                         style = MaterialTheme.typography.titleSmall,
-                        color = ViceTextPrimary
+                        color = colors.textPrimary
                     )
                     Spacer(Modifier.height(3.dp))
                     Text(
                         text = "Dica no PS5: Configurações > Usuários e Contas > Privacidade > Histórico de Jogos = \"Qualquer pessoa\".",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ViceTextMuted
+                        color = colors.textMuted
                     )
                     Spacer(Modifier.height(10.dp))
                     OutlinedTextField(
@@ -546,15 +548,15 @@ fun SyncScreen(
                         onValueChange = { psnIdInput = it },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        placeholder = { Text("Ex: SeuNickPSN", color = ViceTextMuted) },
+                        placeholder = { Text("Ex: SeuNickPSN", color = colors.textMuted) },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ViceOceanCyan,
-                            unfocusedBorderColor = ViceOutline,
-                            focusedContainerColor = ViceMidnight,
-                            unfocusedContainerColor = ViceMidnight,
-                            focusedTextColor = ViceTextPrimary,
-                            unfocusedTextColor = ViceTextPrimary
+                            focusedBorderColor = colors.cyan,
+                            unfocusedBorderColor = colors.outline,
+                            focusedContainerColor = colors.chipBg,
+                            unfocusedContainerColor = colors.chipBg,
+                            focusedTextColor = colors.textPrimary,
+                            unfocusedTextColor = colors.textPrimary
                         )
                     )
                     Spacer(Modifier.height(10.dp))
@@ -565,8 +567,8 @@ fun SyncScreen(
                             .height(46.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = ViceOceanCyan,
-                            contentColor = ViceMidnight
+                            containerColor = colors.cyan,
+                            contentColor = Color.White
                         )
                     ) {
                         Icon(Icons.Rounded.Sync, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -576,7 +578,7 @@ fun SyncScreen(
                 }
             }
 
-            // 5. TROPHY LIST WITH ANTI-SPOILER SHIELD & CUMULATIVE AUTO-MAPPING
+            // 5. TROPHY LIST
             item {
                 ViceSectionHeader(
                     title = "Marcos de Troféus do PS5 (20 principais de 55)",
@@ -584,7 +586,7 @@ fun SyncScreen(
                     trailing = {
                         VicePillBadge(
                             text = "${state.unlockedTrophyIds.size}/${GtaViCatalog.ps5Trophies.size}",
-                            color = ViceSunsetGold
+                            color = colors.gold
                         )
                     }
                 )
@@ -617,12 +619,13 @@ private fun InstructionStep(
     detail: String,
     accent: Color
 ) {
+    val colors = LeonidaTheme.colors
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(ViceDeepSurface)
-            .border(1.dp, ViceOutlineSoft, RoundedCornerShape(14.dp))
+            .background(colors.chipBg)
+            .border(1.dp, colors.outlineSoft, RoundedCornerShape(14.dp))
             .padding(11.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -631,7 +634,7 @@ private fun InstructionStep(
             modifier = Modifier
                 .size(26.dp)
                 .clip(CircleShape)
-                .background(accent.copy(alpha = 0.2f))
+                .background(accent.copy(alpha = if (colors.isDark) 0.2f else 0.14f))
                 .border(1.dp, accent, CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -643,9 +646,9 @@ private fun InstructionStep(
             )
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, color = ViceTextPrimary)
+            Text(title, style = MaterialTheme.typography.titleSmall, color = colors.textPrimary)
             Spacer(Modifier.height(2.dp))
-            Text(detail, style = MaterialTheme.typography.bodySmall, color = ViceTextSecondary)
+            Text(detail, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
         }
     }
 }
@@ -657,13 +660,18 @@ private fun TrophySyncRow(
     hiddenBySpoilerShield: Boolean,
     onToggle: () -> Unit
 ) {
-    val borderColor = if (unlocked) VicePalmMint.copy(alpha = 0.55f) else ViceOutlineSoft
+    val colors = LeonidaTheme.colors
+    val tierColor = trophy.tier.accent(colors)
+    val borderColor = if (unlocked) colors.mint.copy(alpha = 0.55f) else colors.outlineSoft
+    val rowShape = RoundedCornerShape(16.dp)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (unlocked) VicePalmMint.copy(alpha = 0.08f) else ViceCardSurface)
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+            .then(if (colors.isDark) Modifier else Modifier.shadow(2.dp, rowShape))
+            .clip(rowShape)
+            .background(if (unlocked) colors.mintSoft else colors.card)
+            .border(1.dp, borderColor, rowShape)
             .clickable(onClick = onToggle)
             .padding(13.dp),
         verticalAlignment = Alignment.Top,
@@ -677,9 +685,9 @@ private fun TrophySyncRow(
             },
             contentDescription = null,
             tint = when {
-                unlocked -> VicePalmMint
-                hiddenBySpoilerShield -> ViceTextMuted
-                else -> trophy.tier.color
+                unlocked -> colors.mint
+                hiddenBySpoilerShield -> colors.textMuted
+                else -> tierColor
             },
             modifier = Modifier
                 .padding(top = 2.dp)
@@ -693,13 +701,13 @@ private fun TrophySyncRow(
                 Icon(
                     imageVector = Icons.Rounded.EmojiEvents,
                     contentDescription = null,
-                    tint = trophy.tier.color,
+                    tint = tierColor,
                     modifier = Modifier.size(14.dp)
                 )
-                VicePillBadge(text = trophy.tier.label, color = trophy.tier.color)
+                VicePillBadge(text = trophy.tier.label, color = tierColor)
                 if (trophy.grantsChapter != null && !hiddenBySpoilerShield) {
                     val chLabel = if (trophy.grantsChapter >= 6) "Pós-Game" else "Cap. ${trophy.grantsChapter}"
-                    VicePillBadge(text = "→ $chLabel", color = ViceOceanCyan)
+                    VicePillBadge(text = "→ $chLabel", color = colors.cyan)
                 }
             }
             Spacer(Modifier.height(5.dp))
@@ -707,24 +715,24 @@ private fun TrophySyncRow(
                 Text(
                     text = "Troféu Oculto de História (Protegido)",
                     style = MaterialTheme.typography.titleSmall,
-                    color = ViceTextMuted
+                    color = colors.textMuted
                 )
                 Text(
                     text = "Oculto pelo Escudo Anti-Spoiler. Sincronize pela câmera/PSN ou toque aqui se já ganhou.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextMuted
+                    color = colors.textMuted
                 )
             } else {
                 Text(
                     text = trophy.nameEn,
                     style = MaterialTheme.typography.titleSmall,
-                    color = ViceTextPrimary,
+                    color = colors.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = trophy.description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextSecondary
+                    color = colors.textSecondary
                 )
             }
         }
@@ -736,6 +744,12 @@ private fun LiveTvCameraScanner(
     onCaptured: (Uri) -> Unit,
     onCancel: () -> Unit
 ) {
+    // Camera scanner always keeps dark HUD chrome over live camera video feed
+    val overlayBg = Color(0xCC090714)
+    val neonCyan = Color(0xFF00E5FF)
+    val neonPink = Color(0xFFFF2E93)
+    val neonGold = Color(0xFFFFC857)
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -798,7 +812,6 @@ private fun LiveTvCameraScanner(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Neon TV Framing Reticle Overlay
         Canvas(modifier = Modifier.fillMaxSize()) {
             val left = size.width * 0.08f
             val right = size.width * 0.92f
@@ -807,21 +820,19 @@ private fun LiveTvCameraScanner(
             val corner = 34.dp.toPx()
             val stroke = 3.5.dp.toPx()
 
-            // Corner brackets
-            drawLine(ViceOceanCyan, Offset(left, top), Offset(left + corner, top), stroke, StrokeCap.Round)
-            drawLine(ViceOceanCyan, Offset(left, top), Offset(left, top + corner), stroke, StrokeCap.Round)
+            drawLine(neonCyan, Offset(left, top), Offset(left + corner, top), stroke, StrokeCap.Round)
+            drawLine(neonCyan, Offset(left, top), Offset(left, top + corner), stroke, StrokeCap.Round)
 
-            drawLine(ViceNeonPink, Offset(right, top), Offset(right - corner, top), stroke, StrokeCap.Round)
-            drawLine(ViceNeonPink, Offset(right, top), Offset(right, top + corner), stroke, StrokeCap.Round)
+            drawLine(neonPink, Offset(right, top), Offset(right - corner, top), stroke, StrokeCap.Round)
+            drawLine(neonPink, Offset(right, top), Offset(right, top + corner), stroke, StrokeCap.Round)
 
-            drawLine(ViceNeonPink, Offset(left, bottom), Offset(left + corner, bottom), stroke, StrokeCap.Round)
-            drawLine(ViceNeonPink, Offset(left, bottom), Offset(left, bottom - corner), stroke, StrokeCap.Round)
+            drawLine(neonPink, Offset(left, bottom), Offset(left + corner, bottom), stroke, StrokeCap.Round)
+            drawLine(neonPink, Offset(left, bottom), Offset(left, bottom - corner), stroke, StrokeCap.Round)
 
-            drawLine(ViceOceanCyan, Offset(right, bottom), Offset(right - corner, bottom), stroke, StrokeCap.Round)
-            drawLine(ViceOceanCyan, Offset(right, bottom), Offset(right, bottom - corner), stroke, StrokeCap.Round)
+            drawLine(neonCyan, Offset(right, bottom), Offset(right - corner, bottom), stroke, StrokeCap.Round)
+            drawLine(neonCyan, Offset(right, bottom), Offset(right, bottom - corner), stroke, StrokeCap.Round)
         }
 
-        // Top controls + On-screen Instructions Banner
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -839,7 +850,7 @@ private fun LiveTvCameraScanner(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(CircleShape)
-                        .background(ViceMidnight.copy(alpha = 0.78f))
+                        .background(overlayBg)
                         .clickable(onClick = onCancel),
                     contentAlignment = Alignment.Center
                 ) {
@@ -850,7 +861,7 @@ private fun LiveTvCameraScanner(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(CircleShape)
-                        .background(ViceMidnight.copy(alpha = 0.78f))
+                        .background(overlayBg)
                         .clickable {
                             val next = !torchEnabled
                             torchEnabled = next
@@ -861,7 +872,7 @@ private fun LiveTvCameraScanner(
                     Icon(
                         imageVector = if (torchEnabled) Icons.Rounded.FlashOn else Icons.Rounded.FlashOff,
                         contentDescription = "Alternar flash",
-                        tint = if (torchEnabled) ViceSunsetGold else Color.White
+                        tint = if (torchEnabled) neonGold else Color.White
                     )
                 }
             }
@@ -870,20 +881,19 @@ private fun LiveTvCameraScanner(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(ViceMidnight.copy(alpha = 0.82f))
-                    .border(1.dp, ViceOceanCyan.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+                    .background(overlayBg)
+                    .border(1.dp, neonCyan.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
                     .padding(12.dp)
             ) {
                 Text(
                     text = cameraError
                         ?: "Enquadre o menu Progresso/Estatísticas ou Troféus na TV dentro dos cantos neon • 60–100 cm • Evite reflexo e mantenha o flash desligado.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextPrimary
+                    color = Color.White
                 )
             }
         }
 
-        // Bottom Capture Shutter Button
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -922,7 +932,7 @@ private fun LiveTvCameraScanner(
                     .height(56.dp),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = ViceNeonPink,
+                    containerColor = neonPink,
                     contentColor = Color.White
                 )
             ) {

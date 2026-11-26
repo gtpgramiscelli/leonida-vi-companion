@@ -41,9 +41,11 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -70,20 +73,7 @@ import com.leonida.gtavicompanion.ui.components.ViceCard
 import com.leonida.gtavicompanion.ui.components.ViceHeroCard
 import com.leonida.gtavicompanion.ui.components.VicePillBadge
 import com.leonida.gtavicompanion.ui.components.ViceSectionHeader
-import com.leonida.gtavicompanion.ui.theme.ViceCardSurface
-import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
-import com.leonida.gtavicompanion.ui.theme.ViceElevatedSurface
-import com.leonida.gtavicompanion.ui.theme.ViceMidnight
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.ViceOutline
-import com.leonida.gtavicompanion.ui.theme.ViceOutlineSoft
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetGold
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetOrange
-import com.leonida.gtavicompanion.ui.theme.ViceTextMuted
-import com.leonida.gtavicompanion.ui.theme.ViceTextPrimary
-import com.leonida.gtavicompanion.ui.theme.ViceTextSecondary
+import com.leonida.gtavicompanion.ui.theme.LeonidaTheme
 import kotlin.math.roundToInt
 
 private enum class ChecklistFilter(val label: String) {
@@ -100,6 +90,7 @@ fun HomeScreen(
     onOpenChapters: () -> Unit,
     onOpenSync: () -> Unit
 ) {
+    val colors = LeonidaTheme.colors
     var selectedFilter by remember { mutableStateOf(ChecklistFilter.ALL) }
     var expandedCategories by remember {
         mutableStateOf(setOf(ChecklistCategory.STORY_TASKS, ChecklistCategory.DISCOVERY))
@@ -116,7 +107,7 @@ fun HomeScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(ViceMidnight),
+            .background(colors.background),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -129,29 +120,37 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        VicePillBadge(text = "GUIA OFICIAL 100% • LEONIDA", color = ViceOceanCyan)
+                        VicePillBadge(
+                            text = "GUIA OFICIAL 100% • LEONIDA",
+                            color = Color(0xFF00E5FF),
+                            onHero = true
+                        )
                         Spacer(Modifier.height(10.dp))
                         Text(
                             text = "Rumo à Platina\nem Vice City",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = ViceTextPrimary
+                            color = colors.heroTextPrimary
                         )
                         Spacer(Modifier.height(6.dp))
                         Text(
                             text = "${state.completedChecklistIds.size} de ${viewModel.totalChecklistCount} metas de \"A Long Road\"",
                             style = MaterialTheme.typography.bodySmall,
-                            color = ViceTextSecondary
+                            color = colors.heroTextSecondary
                         )
                     }
                     Spacer(Modifier.width(14.dp))
                     Box(
-                        modifier = Modifier.size(92.dp),
+                        modifier = Modifier.size(96.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
-                            val stroke = 9.dp.toPx()
+                            val stroke = 9.5.dp.toPx()
+                            drawCircle(
+                                color = Color.White.copy(alpha = 0.08f),
+                                radius = (size.minDimension - stroke) / 2f
+                            )
                             drawArc(
-                                color = ViceOutline.copy(alpha = 0.45f),
+                                color = Color.White.copy(alpha = 0.18f),
                                 startAngle = 0f,
                                 sweepAngle = 360f,
                                 useCenter = false,
@@ -159,10 +158,18 @@ fun HomeScreen(
                             )
                             drawArc(
                                 brush = Brush.sweepGradient(
-                                    listOf(ViceNeonPink, ViceSunsetOrange, ViceSunsetGold, ViceOceanCyan, ViceNeonPink)
+                                    listOf(
+                                        Color(0xFFFF2E93),
+                                        Color(0xFFFF8A3D),
+                                        Color(0xFFFFD166),
+                                        Color(0xFF00E5FF),
+                                        Color(0xFFFF2E93)
+                                    )
                                 ),
                                 startAngle = -90f,
-                                sweepAngle = (animatedProgress * 360f).coerceAtLeast(if (animatedProgress > 0f) 10f else 0f),
+                                sweepAngle = (animatedProgress * 360f).coerceAtLeast(
+                                    if (animatedProgress > 0f) 10f else 0f
+                                ),
                                 useCenter = false,
                                 style = Stroke(width = stroke, cap = StrokeCap.Round)
                             )
@@ -170,14 +177,14 @@ fun HomeScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = percentText,
-                                fontSize = 20.sp,
+                                fontSize = 21.sp,
                                 fontWeight = FontWeight.Black,
-                                color = ViceTextPrimary
+                                color = colors.heroTextPrimary
                             )
                             Text(
-                                text = "100%",
+                                text = "META 100%",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = ViceSunsetGold
+                                color = Color(0xFFFFD166)
                             )
                         }
                     }
@@ -185,33 +192,35 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Quick summary strip
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    MiniStatChip(
+                    HeroStatChip(
                         label = "Segredos",
                         value = "${state.foundSecretIds.size}/${viewModel.totalSecretsCount}",
-                        color = ViceNeonPink,
+                        color = Color(0xFFFF6EB4),
+                        bg = colors.heroOverlayChipBg,
                         modifier = Modifier.weight(1f),
                         onClick = onOpenMap
                     )
-                    MiniStatChip(
+                    HeroStatChip(
                         label = "Cheats",
                         value = "${state.unlockedCheatIds.size}/${viewModel.totalCheatsTrackedCount}",
-                        color = ViceSunsetGold,
+                        color = Color(0xFFFFD166),
+                        bg = colors.heroOverlayChipBg,
                         modifier = Modifier.weight(1f),
                         onClick = null
                     )
-                    MiniStatChip(
+                    HeroStatChip(
                         label = "História",
                         value = when (state.currentChapter) {
                             0 -> "Prólogo"
                             6 -> "Zerado"
                             else -> "Cap. ${state.currentChapter}"
                         },
-                        color = VicePalmMint,
+                        color = Color(0xFF3BF0B8),
+                        bg = colors.heroOverlayChipBg,
                         modifier = Modifier.weight(1f),
                         onClick = onOpenChapters
                     )
@@ -221,7 +230,8 @@ fun HomeScreen(
 
                 ChapterProgressSelector(
                     currentChapter = state.currentChapter,
-                    onSelectChapter = viewModel::setCurrentChapter
+                    onSelectChapter = viewModel::setCurrentChapter,
+                    onHero = true
                 )
             }
         }
@@ -229,8 +239,8 @@ fun HomeScreen(
         // 1.5 QUICK PS5 SYNC LAUNCHER CARD (Câmera na TV + Troféus PSN)
         item {
             ViceCard(
-                accentBorder = ViceOceanCyan.copy(alpha = 0.55f),
-                backgroundColor = ViceCardSurface,
+                accentBorder = colors.cyan.copy(alpha = 0.48f),
+                backgroundColor = colors.card,
                 onClick = onOpenSync
             ) {
                 Row(
@@ -240,32 +250,39 @@ fun HomeScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(ViceOceanCyan.copy(alpha = 0.16f))
-                            .border(1.dp, ViceOceanCyan.copy(alpha = 0.55f), RoundedCornerShape(14.dp)),
+                            .size(46.dp)
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(
+                                        colors.cyan.copy(alpha = 0.22f),
+                                        colors.pink.copy(alpha = 0.20f)
+                                    )
+                                )
+                            )
+                            .border(1.dp, colors.cyan.copy(alpha = 0.55f), RoundedCornerShape(15.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.CameraAlt,
                             contentDescription = null,
-                            tint = ViceOceanCyan,
+                            tint = colors.cyan,
                             modifier = Modifier.size(22.dp)
                         )
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(7.dp)
                         ) {
                             Text(
                                 text = "Sincronizar com PS5",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = ViceTextPrimary
+                                color = colors.textPrimary
                             )
-                            VicePillBadge(text = "CÂMERA + PSN", color = ViceOceanCyan)
+                            VicePillBadge(text = "CÂMERA + PSN", color = colors.cyan)
                         }
-                        Spacer(Modifier.height(2.dp))
+                        Spacer(Modifier.height(3.dp))
                         Text(
                             text = if (state.lastSyncSummary.isNotBlank()) {
                                 state.lastSyncSummary
@@ -273,13 +290,13 @@ fun HomeScreen(
                                 "Aponte para a TV, importe prints do PS App ou sincronize troféus PSN."
                             },
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (state.lastSyncSummary.isNotBlank()) VicePalmMint else ViceTextSecondary
+                            color = if (state.lastSyncSummary.isNotBlank()) colors.mint else colors.textSecondary
                         )
                     }
                     Icon(
                         imageVector = Icons.Rounded.ChevronRight,
                         contentDescription = null,
-                        tint = ViceOceanCyan
+                        tint = colors.cyan
                     )
                 }
             }
@@ -304,7 +321,7 @@ fun HomeScreen(
                         target = 200,
                         max = 277,
                         icon = Icons.Rounded.DirectionsCar,
-                        accent = ViceOceanCyan,
+                        accent = colors.cyan,
                         onAdjust = viewModel::adjustWainkCount,
                         modifier = Modifier.weight(1f)
                     )
@@ -315,7 +332,7 @@ fun HomeScreen(
                         target = 100,
                         max = 255,
                         icon = Icons.Rounded.Pets,
-                        accent = VicePalmMint,
+                        accent = colors.mint,
                         onAdjust = viewModel::adjustAnimalsCount,
                         modifier = Modifier.weight(1f)
                     )
@@ -331,7 +348,7 @@ fun HomeScreen(
                         target = 50,
                         max = 91,
                         icon = Icons.Rounded.Storefront,
-                        accent = ViceSunsetOrange,
+                        accent = colors.orange,
                         onAdjust = viewModel::adjustStickUpsCount,
                         modifier = Modifier.weight(1f)
                     )
@@ -342,7 +359,7 @@ fun HomeScreen(
                         target = 42,
                         max = 42,
                         icon = Icons.Rounded.GpsFixed,
-                        accent = ViceNeonPink,
+                        accent = colors.pink,
                         onAdjust = viewModel::adjustShootingGoldCount,
                         modifier = Modifier.weight(1f)
                     )
@@ -355,9 +372,9 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(VicePalmMint.copy(alpha = 0.11f))
-                    .border(1.dp, VicePalmMint.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(colors.mintSoft)
+                    .border(1.dp, colors.mint.copy(alpha = 0.4f), RoundedCornerShape(18.dp))
                     .padding(14.dp),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -365,20 +382,20 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Rounded.TipsAndUpdates,
                     contentDescription = null,
-                    tint = VicePalmMint,
+                    tint = colors.mint,
                     modifier = Modifier.size(20.dp)
                 )
                 Column {
                     Text(
                         text = "Zero estresse: nada do 100% é perdível!",
                         style = MaterialTheme.typography.titleSmall,
-                        color = VicePalmMint
+                        color = colors.mint
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = "O rastreador oficial aparece no jogo após zerar, mas tudo que você fizer agora já conta retroativamente. Evite ativar cheats no seu save principal!",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ViceTextSecondary
+                        color = colors.textSecondary
                     )
                 }
             }
@@ -392,7 +409,7 @@ fun HomeScreen(
                 trailing = {
                     VicePillBadge(
                         text = "${state.completedChecklistIds.size}/35",
-                        color = ViceSunsetGold
+                        color = colors.gold
                     )
                 }
             )
@@ -404,16 +421,16 @@ fun HomeScreen(
                         onClick = { selectedFilter = filter },
                         label = { Text(filter.label, style = MaterialTheme.typography.labelMedium) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = ViceNeonPink.copy(alpha = 0.22f),
-                            selectedLabelColor = ViceNeonPink,
-                            containerColor = ViceDeepSurface,
-                            labelColor = ViceTextSecondary
+                            selectedContainerColor = colors.pinkSoft,
+                            selectedLabelColor = colors.pink,
+                            containerColor = colors.card,
+                            labelColor = colors.textSecondary
                         ),
                         border = FilterChipDefaults.filterChipBorder(
                             enabled = true,
                             selected = selectedFilter == filter,
-                            borderColor = ViceOutline,
-                            selectedBorderColor = ViceNeonPink
+                            borderColor = colors.outline,
+                            selectedBorderColor = colors.pink
                         )
                     )
                 }
@@ -421,6 +438,7 @@ fun HomeScreen(
         }
 
         items(ChecklistCategory.entries, key = { it.name }) { category ->
+            val catAccent = category.accent(colors)
             val allInCat = GtaViCatalog.completionChecklist.filter { it.category == category }
             val doneInCat = allInCat.count { it.id in state.completedChecklistIds }
             val filteredItems = allInCat.filter { item ->
@@ -434,8 +452,8 @@ fun HomeScreen(
             val isExpanded = category in expandedCategories
 
             ViceCard(
-                accentBorder = category.color.copy(alpha = 0.4f),
-                backgroundColor = ViceCardSurface
+                accentBorder = catAccent.copy(alpha = 0.4f),
+                backgroundColor = colors.card
             ) {
                 Row(
                     modifier = Modifier
@@ -457,24 +475,24 @@ fun HomeScreen(
                             Text(
                                 text = category.label,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = ViceTextPrimary
+                                color = colors.textPrimary
                             )
                             VicePillBadge(
                                 text = "$doneInCat/${allInCat.size}",
-                                color = category.color
+                                color = catAccent
                             )
                         }
                         Spacer(Modifier.height(3.dp))
                         Text(
                             text = category.subtitle,
                             style = MaterialTheme.typography.bodySmall,
-                            color = ViceTextMuted
+                            color = colors.textMuted
                         )
                     }
                     Icon(
                         imageVector = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
                         contentDescription = null,
-                        tint = ViceTextSecondary
+                        tint = colors.textSecondary
                     )
                 }
 
@@ -485,8 +503,8 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .height(6.dp)
                         .clip(RoundedCornerShape(50)),
-                    color = category.color,
-                    trackColor = ViceMidnight
+                    color = catAccent,
+                    trackColor = colors.chipBg
                 )
 
                 AnimatedVisibility(visible = isExpanded) {
@@ -498,7 +516,7 @@ fun HomeScreen(
                             Text(
                                 text = "Nenhum item neste filtro.",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = ViceTextMuted,
+                                color = colors.textMuted,
                                 modifier = Modifier.padding(vertical = 6.dp)
                             )
                         } else {
@@ -506,7 +524,7 @@ fun HomeScreen(
                                 ChecklistRow(
                                     item = item,
                                     checked = item.id in state.completedChecklistIds,
-                                    accent = category.color,
+                                    accent = catAccent,
                                     onToggle = { viewModel.toggleChecklistItem(item.id) }
                                 )
                             }
@@ -521,18 +539,20 @@ fun HomeScreen(
 }
 
 @Composable
-private fun MiniStatChip(
+private fun HeroStatChip(
     label: String,
     value: String,
     color: Color,
+    bg: Color,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)?
 ) {
+    val colors = LeonidaTheme.colors
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(ViceMidnight.copy(alpha = 0.72f))
-            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+            .background(bg)
+            .border(1.dp, color.copy(alpha = 0.45f), RoundedCornerShape(14.dp))
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 10.dp, vertical = 9.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -546,7 +566,7 @@ private fun MiniStatChip(
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = ViceTextSecondary
+            color = colors.heroTextSecondary
         )
     }
 }
@@ -563,17 +583,22 @@ private fun FieldCounterCard(
     onAdjust: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = LeonidaTheme.colors
     val reachedGoal = count >= target
+    val cardAccent = if (reachedGoal) colors.mint else accent
+    val cardShape = RoundedCornerShape(20.dp)
+
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(18.dp))
-            .background(ViceCardSurface)
+            .then(if (colors.isDark) Modifier else Modifier.shadow(2.5.dp, cardShape))
+            .clip(cardShape)
+            .background(colors.card)
             .border(
                 width = 1.dp,
-                color = if (reachedGoal) VicePalmMint.copy(alpha = 0.7f) else ViceOutlineSoft,
-                shape = RoundedCornerShape(18.dp)
+                color = if (reachedGoal) colors.mint.copy(alpha = 0.65f) else colors.outlineSoft,
+                shape = cardShape
             )
-            .padding(12.dp)
+            .padding(13.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -583,35 +608,52 @@ private fun FieldCounterCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (reachedGoal) VicePalmMint else accent,
-                modifier = Modifier.size(18.dp)
+                tint = cardAccent,
+                modifier = Modifier.size(19.dp)
             )
-            Text(
-                text = if (reachedGoal) "META OK!" else "$count / $target",
-                style = MaterialTheme.typography.labelMedium,
-                color = if (reachedGoal) VicePalmMint else accent
+            VicePillBadge(
+                text = if (reachedGoal) "META OK!" else "Meta $target",
+                color = cardAccent
             )
         }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(8.dp))
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "$count",
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Black,
+                color = colors.textPrimary
+            )
+            Text(
+                text = "/ $target",
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.textMuted,
+                modifier = Modifier.padding(bottom = 3.dp)
+            )
+        }
+        Spacer(Modifier.height(2.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
-            color = ViceTextPrimary
+            color = colors.textPrimary
         )
         Text(
             text = "$subtitle (máx. $max)",
             style = MaterialTheme.typography.bodySmall,
-            color = ViceTextMuted
+            color = colors.textMuted
         )
         Spacer(Modifier.height(8.dp))
         LinearProgressIndicator(
             progress = { (count.toFloat() / target).coerceIn(0f, 1f) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(5.dp)
+                .height(6.dp)
                 .clip(RoundedCornerShape(50)),
-            color = if (reachedGoal) VicePalmMint else accent,
-            trackColor = ViceMidnight
+            color = cardAccent,
+            trackColor = colors.chipBg
         )
         Spacer(Modifier.height(10.dp))
         Row(
@@ -621,22 +663,23 @@ private fun FieldCounterCard(
         ) {
             CounterStepButton(
                 onClick = { onAdjust(-1) },
-                accent = ViceTextSecondary
+                accent = colors.textSecondary
             ) {
                 Icon(Icons.Rounded.Remove, contentDescription = "Diminuir", modifier = Modifier.size(16.dp))
             }
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .background(ViceElevatedSurface)
+                    .background(cardAccent.copy(alpha = if (colors.isDark) 0.18f else 0.12f))
+                    .border(1.dp, cardAccent.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
                     .clickable { onAdjust(5) }
-                    .padding(horizontal = 9.dp, vertical = 5.dp)
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
             ) {
-                Text("+5", style = MaterialTheme.typography.labelSmall, color = accent)
+                Text("+5", style = MaterialTheme.typography.labelSmall, color = cardAccent)
             }
             CounterStepButton(
                 onClick = { onAdjust(1) },
-                accent = accent
+                accent = cardAccent
             ) {
                 Icon(Icons.Rounded.Add, contentDescription = "Aumentar", modifier = Modifier.size(16.dp))
             }
@@ -650,19 +693,18 @@ private fun CounterStepButton(
     accent: Color,
     content: @Composable () -> Unit
 ) {
+    val colors = LeonidaTheme.colors
     Box(
         modifier = Modifier
-            .size(30.dp)
+            .size(32.dp)
             .clip(CircleShape)
-            .background(accent.copy(alpha = 0.16f))
-            .border(1.dp, accent.copy(alpha = 0.45f), CircleShape)
+            .background(accent.copy(alpha = if (colors.isDark) 0.16f else 0.10f))
+            .border(1.dp, accent.copy(alpha = 0.42f), CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.material3.LocalContentColor.let {
-            androidx.compose.runtime.CompositionLocalProvider(it provides accent) {
-                content()
-            }
+        CompositionLocalProvider(LocalContentColor provides accent) {
+            content()
         }
     }
 }
@@ -674,14 +716,15 @@ private fun ChecklistRow(
     accent: Color,
     onToggle: () -> Unit
 ) {
+    val colors = LeonidaTheme.colors
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(if (checked) VicePalmMint.copy(alpha = 0.08f) else ViceDeepSurface)
+            .background(if (checked) colors.mintSoft else colors.chipBg)
             .border(
                 1.dp,
-                if (checked) VicePalmMint.copy(alpha = 0.35f) else ViceOutlineSoft,
+                if (checked) colors.mint.copy(alpha = 0.42f) else colors.outlineSoft,
                 RoundedCornerShape(14.dp)
             )
             .clickable(onClick = onToggle)
@@ -692,7 +735,7 @@ private fun ChecklistRow(
         Icon(
             imageVector = if (checked) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
             contentDescription = null,
-            tint = if (checked) VicePalmMint else accent.copy(alpha = 0.7f),
+            tint = if (checked) colors.mint else accent.copy(alpha = 0.8f),
             modifier = Modifier
                 .padding(top = 2.dp)
                 .size(21.dp)
@@ -701,20 +744,20 @@ private fun ChecklistRow(
             Text(
                 text = item.title,
                 style = MaterialTheme.typography.titleSmall,
-                color = if (checked) ViceTextMuted else ViceTextPrimary,
+                color = if (checked) colors.textMuted else colors.textPrimary,
                 textDecoration = if (checked) TextDecoration.LineThrough else TextDecoration.None
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = item.requirement,
                 style = MaterialTheme.typography.bodySmall,
-                color = if (checked) ViceTextMuted else ViceTextSecondary
+                color = if (checked) colors.textMuted else colors.textSecondary
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Dica: ${item.tip}",
                 style = MaterialTheme.typography.bodySmall,
-                color = accent.copy(alpha = 0.85f)
+                color = accent
             )
         }
     }

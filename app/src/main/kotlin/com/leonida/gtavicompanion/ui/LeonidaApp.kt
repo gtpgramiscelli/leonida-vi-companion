@@ -3,9 +3,12 @@ package com.leonida.gtavicompanion.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,15 +34,14 @@ import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +51,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.leonida.gtavicompanion.ui.components.UpdateAvailableBanner
@@ -59,15 +62,7 @@ import com.leonida.gtavicompanion.ui.screens.ExtrasScreen
 import com.leonida.gtavicompanion.ui.screens.HomeScreen
 import com.leonida.gtavicompanion.ui.screens.MapScreen
 import com.leonida.gtavicompanion.ui.screens.SyncScreen
-import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
-import com.leonida.gtavicompanion.ui.theme.ViceMidnight
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.ViceOutlineSoft
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetOrange
-import com.leonida.gtavicompanion.ui.theme.ViceTextMuted
-import com.leonida.gtavicompanion.ui.theme.ViceTextPrimary
+import com.leonida.gtavicompanion.ui.theme.LeonidaTheme
 
 enum class CompanionTab(
     val label: String,
@@ -82,6 +77,7 @@ enum class CompanionTab(
 
 @Composable
 fun LeonidaApp(viewModel: CompanionViewModel) {
+    val colors = LeonidaTheme.colors
     val state by viewModel.state.collectAsStateWithLifecycle()
     val updateState by viewModel.updateState.collectAsStateWithLifecycle()
     var currentTab by rememberSaveable { mutableStateOf(CompanionTab.HOME) }
@@ -109,7 +105,7 @@ fun LeonidaApp(viewModel: CompanionViewModel) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = ViceMidnight,
+        containerColor = colors.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             Column {
@@ -130,67 +126,16 @@ fun LeonidaApp(viewModel: CompanionViewModel) {
             }
         },
         bottomBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(ViceDeepSurface)
-                    .navigationBarsPadding()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    Color.Transparent,
-                                    ViceNeonPink.copy(alpha = 0.55f),
-                                    ViceOceanCyan.copy(alpha = 0.55f),
-                                    Color.Transparent
-                                )
-                            )
-                        )
-                )
-                NavigationBar(
-                    containerColor = ViceDeepSurface,
-                    tonalElevation = 0.dp,
-                    windowInsets = WindowInsets(0, 0, 0, 0)
-                ) {
-                    CompanionTab.entries.forEach { tab ->
-                        val selected = tab == currentTab
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = { currentTab = tab },
-                            icon = {
-                                Icon(
-                                    imageVector = tab.icon,
-                                    contentDescription = tab.label,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = tab.label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    maxLines = 1
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = ViceNeonPink,
-                                selectedTextColor = ViceNeonPink,
-                                indicatorColor = ViceNeonPink.copy(alpha = 0.16f),
-                                unselectedIconColor = ViceTextMuted,
-                                unselectedTextColor = ViceTextMuted
-                            )
-                        )
-                    }
-                }
-            }
+            ViceFloatingDock(
+                currentTab = currentTab,
+                onSelectTab = { currentTab = it }
+            )
         }
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(colors.background)
                 .padding(innerPadding)
         ) {
             Crossfade(
@@ -245,111 +190,194 @@ private fun ViceTopHeader(
     onOpenSync: () -> Unit,
     onOpenUpdateSheet: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(ViceDeepSurface)
-            .statusBarsPadding()
+    val colors = LeonidaTheme.colors
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = colors.surface,
+        shadowElevation = if (colors.isDark) 0.dp else 4.dp
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        Brush.linearGradient(listOf(ViceNeonPink, ViceSunsetOrange))
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "VI",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Black,
-                    color = Color.White
-                )
-            }
-            Spacer(Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "LEONIDA COMPANION",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Black,
-                    color = ViceTextPrimary
-                )
-                Text(
-                    text = when (currentChapter) {
-                        0 -> "Prólogo • Guia offline PS5"
-                        6 -> "Pós-Game • Rumo ao 100%"
-                        else -> "Capítulo $currentChapter • Guia offline PS5"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextMuted
-                )
-            }
+        Column(modifier = Modifier.statusBarsPadding()) {
             Row(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(ViceOceanCyan.copy(alpha = 0.14f))
-                    .border(1.dp, ViceOceanCyan.copy(alpha = 0.55f), RoundedCornerShape(50))
-                    .clickable(onClick = onOpenSync)
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 11.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.CameraAlt,
-                    contentDescription = "Sincronizar PS5",
-                    tint = ViceOceanCyan,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(Modifier.width(5.dp))
-                Text(
-                    text = "PS5 SYNC",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = ViceOceanCyan
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(11.dp))
+                        .background(
+                            Brush.linearGradient(listOf(Color(0xFFFF2E93), Color(0xFFFF8A3D)))
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "VI",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "LEONIDA VI",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Black,
+                        color = colors.textPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = when (currentChapter) {
+                            0 -> "Prólogo • Guia PS5"
+                            6 -> "Pós-Game • Rumo ao 100%"
+                            else -> "Capítulo $currentChapter • Guia PS5"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(colors.cyan.copy(alpha = if (colors.isDark) 0.14f else 0.11f))
+                        .border(1.dp, colors.cyan.copy(alpha = 0.5f), RoundedCornerShape(50))
+                        .clickable(onClick = onOpenSync)
+                        .padding(horizontal = 11.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CameraAlt,
+                        contentDescription = "Sincronizar PS5",
+                        tint = colors.cyan,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        text = "PS5",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.cyan
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(colors.chipBg)
+                        .border(
+                            1.dp,
+                            if (hasUpdate) colors.mint else colors.outlineSoft,
+                            CircleShape
+                        )
+                        .clickable(onClick = onOpenUpdateSheet),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CloudDownload,
+                        contentDescription = "Verificar atualizações",
+                        tint = if (hasUpdate) colors.mint else colors.textMuted,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    if (hasUpdate) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(5.dp)
+                                .size(7.dp)
+                                .clip(CircleShape)
+                                .background(colors.pink)
+                        )
+                    }
+                }
+            }
+            if (colors.isDark) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.outlineSoft)
                 )
             }
-            Spacer(Modifier.width(8.dp))
-            Box(
+        }
+    }
+}
+
+@Composable
+private fun ViceFloatingDock(
+    currentTab: CompanionTab,
+    onSelectTab: (CompanionTab) -> Unit
+) {
+    val colors = LeonidaTheme.colors
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+            .navigationBarsPadding()
+            .padding(horizontal = 14.dp)
+            .padding(top = 4.dp, bottom = 10.dp)
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(26.dp),
+            color = colors.navDockBg,
+            shadowElevation = if (colors.isDark) 8.dp else 10.dp,
+            border = BorderStroke(1.dp, colors.outlineSoft)
+        ) {
+            Row(
                 modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape)
-                    .background(ViceMidnight)
-                    .border(
-                        1.dp,
-                        if (hasUpdate) VicePalmMint else ViceOutlineSoft,
-                        CircleShape
-                    )
-                    .clickable(onClick = onOpenUpdateSheet),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .padding(horizontal = 6.dp, vertical = 7.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.CloudDownload,
-                    contentDescription = "Verificar atualizações",
-                    tint = if (hasUpdate) VicePalmMint else ViceTextMuted,
-                    modifier = Modifier.size(18.dp)
-                )
-                if (hasUpdate) {
-                    Box(
+                CompanionTab.entries.forEach { tab ->
+                    val selected = tab == currentTab
+                    val tint = if (selected) colors.pink else colors.textMuted
+                    Column(
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(5.dp)
-                            .size(7.dp)
-                            .clip(CircleShape)
-                            .background(ViceNeonPink)
-                    )
+                            .weight(1f)
+                            .clip(RoundedCornerShape(18.dp))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { onSelectTab(tab) }
+                            )
+                            .padding(vertical = 3.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(
+                                    if (selected) colors.pink.copy(alpha = 0.14f) else Color.Transparent
+                                )
+                                .padding(horizontal = 14.dp, vertical = 4.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = tab.icon,
+                                contentDescription = tab.label,
+                                tint = tint,
+                                modifier = Modifier.size(21.dp)
+                            )
+                        }
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = tab.label,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = tint,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(ViceOutlineSoft)
-        )
     }
 }

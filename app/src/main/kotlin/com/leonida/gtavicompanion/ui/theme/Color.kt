@@ -1,35 +1,148 @@
 package com.leonida.gtavicompanion.ui.theme
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-// Vice City / Leonida Midnight & Neon Sunset Palette
-val ViceMidnight = Color(0xFF090714)
-val ViceDeepSurface = Color(0xFF120F24)
-val ViceCardSurface = Color(0xFF1A1533)
-val ViceElevatedSurface = Color(0xFF251E47)
-val ViceOutline = Color(0xFF392E63)
-val ViceOutlineSoft = Color(0xFF2A224D)
+@Immutable
+data class LeonidaColors(
+    val isDark: Boolean,
+    // Surfaces & Borders
+    val background: Color,
+    val surface: Color,
+    val card: Color,
+    val cardElevated: Color,
+    val chipBg: Color,
+    val outline: Color,
+    val outlineSoft: Color,
+    val navDockBg: Color,
+    // Typography
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val textMuted: Color,
+    // Adaptive High-Contrast Accents
+    val pink: Color,
+    val pinkSoft: Color,
+    val orange: Color,
+    val gold: Color,
+    val cyan: Color,
+    val cyanSoft: Color,
+    val mint: Color,
+    val mintSoft: Color,
+    val purple: Color,
+    val silver: Color,
+    val danger: Color,
+    val dangerSoft: Color,
+    // Hero Sunset Anchor (white text in both Light & Dark)
+    val heroStart: Color,
+    val heroMid: Color,
+    val heroEnd: Color,
+    val heroTextPrimary: Color,
+    val heroTextSecondary: Color,
+    val heroOverlayChipBg: Color,
+    // Adaptive Leonida Vector Map Palette
+    val mapOceanTop: Color,
+    val mapOceanMid: Color,
+    val mapOceanBottom: Color,
+    val mapLandTop: Color,
+    val mapLandMid: Color,
+    val mapLandBottom: Color,
+    val mapLake: Color,
+    val mapBarrierIsland: Color,
+    val mapKeyIsland: Color,
+    val mapGrid: Color,
+    val mapHighway: Color,
+    val mapPinCenter: Color,
+    val mapControlBg: Color
+)
 
-val ViceNeonPink = Color(0xFFFF2E93)
-val ViceNeonPinkSoft = Color(0xFF471235)
-val ViceSunsetOrange = Color(0xFFFF8A3D)
-val ViceSunsetGold = Color(0xFFFFC857)
-val ViceOceanCyan = Color(0xFF00E5FF)
-val ViceOceanCyanSoft = Color(0xFF0A3342)
-val VicePalmMint = Color(0xFF22E5A8)
-val VicePalmMintSoft = Color(0xFF0D3832)
-val VicePurpleGlow = Color(0xFFA855F7)
-val ViceDangerRed = Color(0xFFFF4D6D)
-val ViceDangerSoft = Color(0xFF3F1322)
+val DarkLeonidaColors = LeonidaColors(
+    isDark = true,
+    background = Color(0xFF080712),
+    surface = Color(0xFF110E21),
+    card = Color(0xFF17132D),
+    cardElevated = Color(0xFF221C42),
+    chipBg = Color(0xFF120F24),
+    outline = Color(0xFF352B5C),
+    outlineSoft = Color(0xFF251E44),
+    navDockBg = Color(0xFF16122B),
+    textPrimary = Color(0xFFF7F4FF),
+    textSecondary = Color(0xFFC1B9DE),
+    textMuted = Color(0xFF857CA8),
+    pink = Color(0xFFFF2E93),
+    pinkSoft = Color(0xFF471235),
+    orange = Color(0xFFFF8A3D),
+    gold = Color(0xFFFFC857),
+    cyan = Color(0xFF00E5FF),
+    cyanSoft = Color(0xFF0A3342),
+    mint = Color(0xFF22E5A8),
+    mintSoft = Color(0xFF0D3832),
+    purple = Color(0xFFB469FF),
+    silver = Color(0xFFD4D8E8),
+    danger = Color(0xFFFF4D6D),
+    dangerSoft = Color(0xFF3A1221),
+    heroStart = Color(0xFF2D104C),
+    heroMid = Color(0xFF1B123C),
+    heroEnd = Color(0xFF0D223D),
+    heroTextPrimary = Color(0xFFFFFFFF),
+    heroTextSecondary = Color(0xFFDDD6F5),
+    heroOverlayChipBg = Color(0x940B0818),
+    mapOceanTop = Color(0xFF0A142B),
+    mapOceanMid = Color(0xFF071A33),
+    mapOceanBottom = Color(0xFF05213B),
+    mapLandTop = Color(0xFF1E193A),
+    mapLandMid = Color(0xFF191F3E),
+    mapLandBottom = Color(0xFF13283D),
+    mapLake = Color(0xFF062445),
+    mapBarrierIsland = Color(0xFF28173F),
+    mapKeyIsland = Color(0xFF162C42),
+    mapGrid = Color(0x1400E5FF),
+    mapHighway = Color(0x47FFC857),
+    mapPinCenter = Color(0xFF080712),
+    mapControlBg = Color(0xFF0B0818)
+)
 
-val ViceTextPrimary = Color(0xFFF7F4FF)
-val ViceTextSecondary = Color(0xFFB8B0D4)
-val ViceTextMuted = Color(0xFF7D749E)
-
-// Region Map Accent Colors
-val RegionViceCity = Color(0xFFFF2E93)
-val RegionLeonidaKeys = Color(0xFF00E5FF)
-val RegionGrassrivers = Color(0xFF22E5A8)
-val RegionPortGellhorn = Color(0xFFFF8A3D)
-val RegionAmbrosia = Color(0xFFFFC857)
-val RegionMountKalaga = Color(0xFFA855F7)
+val LightLeonidaColors = LeonidaColors(
+    isDark = false,
+    background = Color(0xFFF8F5FC),
+    surface = Color(0xFFFFFFFF),
+    card = Color(0xFFFFFFFF),
+    cardElevated = Color(0xFFF3ECFA),
+    chipBg = Color(0xFFF1ECF8),
+    outline = Color(0xFFD9CEEB),
+    outlineSoft = Color(0xFFEAE2F5),
+    navDockBg = Color(0xFFFFFFFF),
+    textPrimary = Color(0xFF16102B),
+    textSecondary = Color(0xFF4E456B),
+    textMuted = Color(0xFF7B7299),
+    pink = Color(0xFFD41471),
+    pinkSoft = Color(0xFFFDE8F3),
+    orange = Color(0xFFD45A10),
+    gold = Color(0xFFB07200),
+    cyan = Color(0xFF0082A3),
+    cyanSoft = Color(0xFFE4F6FB),
+    mint = Color(0xFF0A9468),
+    mintSoft = Color(0xFFE4F8F1),
+    purple = Color(0xFF7C3AED),
+    silver = Color(0xFF5B6480),
+    danger = Color(0xFFCF2246),
+    dangerSoft = Color(0xFFFDECEF),
+    heroStart = Color(0xFF2B104E),
+    heroMid = Color(0xFF7A1A60),
+    heroEnd = Color(0xFFCF3E66),
+    heroTextPrimary = Color(0xFFFFFFFF),
+    heroTextSecondary = Color(0xFFFCEBF5),
+    heroOverlayChipBg = Color(0x61160A29),
+    mapOceanTop = Color(0xFFC8ECF9),
+    mapOceanMid = Color(0xFFB2E1F4),
+    mapOceanBottom = Color(0xFF98D4EC),
+    mapLandTop = Color(0xFFF7F2FA),
+    mapLandMid = Color(0xFFEFEAF6),
+    mapLandBottom = Color(0xFFE7F3EE),
+    mapLake = Color(0xFF9ED7EE),
+    mapBarrierIsland = Color(0xFFF9EAF4),
+    mapKeyIsland = Color(0xFFE3F5F2),
+    mapGrid = Color(0x1C0082A3),
+    mapHighway = Color(0x70D48400),
+    mapPinCenter = Color(0xFFFFFFFF),
+    mapControlBg = Color(0xFFFFFFFF)
+)

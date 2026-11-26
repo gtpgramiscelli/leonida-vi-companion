@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -54,26 +53,14 @@ import com.leonida.gtavicompanion.ui.components.PlatformSwitcher
 import com.leonida.gtavicompanion.ui.components.ViceCard
 import com.leonida.gtavicompanion.ui.components.ViceHeroCard
 import com.leonida.gtavicompanion.ui.components.VicePillBadge
-import com.leonida.gtavicompanion.ui.theme.ViceCardSurface
-import com.leonida.gtavicompanion.ui.theme.ViceDangerRed
-import com.leonida.gtavicompanion.ui.theme.ViceDangerSoft
-import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
-import com.leonida.gtavicompanion.ui.theme.ViceMidnight
-import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
-import com.leonida.gtavicompanion.ui.theme.ViceOceanCyan
-import com.leonida.gtavicompanion.ui.theme.ViceOutline
-import com.leonida.gtavicompanion.ui.theme.ViceOutlineSoft
-import com.leonida.gtavicompanion.ui.theme.VicePalmMint
-import com.leonida.gtavicompanion.ui.theme.ViceSunsetGold
-import com.leonida.gtavicompanion.ui.theme.ViceTextMuted
-import com.leonida.gtavicompanion.ui.theme.ViceTextPrimary
-import com.leonida.gtavicompanion.ui.theme.ViceTextSecondary
+import com.leonida.gtavicompanion.ui.theme.LeonidaTheme
 
 @Composable
 fun CheatsScreen(
     state: UserProgressState,
     viewModel: CompanionViewModel
 ) {
+    val colors = LeonidaTheme.colors
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<CheatCategory?>(null) }
     var onlyFavorites by remember { mutableStateOf(false) }
@@ -93,7 +80,7 @@ fun CheatsScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(ViceMidnight),
+            .background(colors.background),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -106,17 +93,22 @@ fun CheatsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        VicePillBadge(text = "SISTEMA DE 61 CHEATS", color = ViceSunsetGold)
+                        VicePillBadge(
+                            text = "SISTEMA DE 61 CHEATS",
+                            color = Color(0xFFFFD166),
+                            onHero = true
+                        )
                         Spacer(Modifier.height(6.dp))
                         Text(
                             text = "Códigos de GTA VI",
                             style = MaterialTheme.typography.headlineSmall,
-                            color = ViceTextPrimary
+                            color = colors.heroTextPrimary
                         )
                     }
                     PlatformSwitcher(
                         selected = state.platform,
-                        onSelect = viewModel::setPlatform
+                        onSelect = viewModel::setPlatform,
+                        onHero = true
                     )
                 }
 
@@ -124,7 +116,7 @@ fun CheatsScreen(
                 Text(
                     text = "Como ativar no ${state.platform.label}:",
                     style = MaterialTheme.typography.titleSmall,
-                    color = ViceOceanCyan
+                    color = Color(0xFF00E5FF)
                 )
                 Spacer(Modifier.height(6.dp))
                 Row(
@@ -132,15 +124,30 @@ fun CheatsScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    StepPill("1. D-Pad ↑ (Celular)", ViceOceanCyan, Modifier.weight(1f))
-                    StepPill("2. ${state.platform.holdButton} + ${state.platform.tapButton}", ViceNeonPink, Modifier.weight(0.9f))
-                    StepPill("3. Digite Setas", ViceSunsetGold, Modifier.weight(0.95f))
+                    StepPill(
+                        text = "1. D-Pad ↑ (Celular)",
+                        color = Color(0xFF00E5FF),
+                        bg = colors.heroOverlayChipBg,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StepPill(
+                        text = "2. ${state.platform.holdButton} + ${state.platform.tapButton}",
+                        color = Color(0xFFFF6EB4),
+                        bg = colors.heroOverlayChipBg,
+                        modifier = Modifier.weight(0.9f)
+                    )
+                    StepPill(
+                        text = "3. Digite Setas",
+                        color = Color(0xFFFFD166),
+                        bg = colors.heroOverlayChipBg,
+                        modifier = Modifier.weight(0.95f)
+                    )
                 }
                 Spacer(Modifier.height(10.dp))
                 Text(
                     text = "Em GTA VI não há números discáveis como em GTA V. Os cheats liberam após terminar a história (91 missões) e cada um exige um desafio específico em Progresso > Cheats.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextSecondary
+                    color = colors.heroTextSecondary
                 )
             }
         }
@@ -150,9 +157,9 @@ fun CheatsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(ViceDangerSoft)
-                    .border(1.dp, ViceDangerRed.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(colors.dangerSoft)
+                    .border(1.dp, colors.danger.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
                     .padding(13.dp),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -160,20 +167,20 @@ fun CheatsScreen(
                 Icon(
                     imageVector = Icons.Rounded.WarningAmber,
                     contentDescription = null,
-                    tint = ViceDangerRed,
+                    tint = colors.danger,
                     modifier = Modifier.size(20.dp)
                 )
                 Column {
                     Text(
                         text = "ATENÇÃO: Save e Troféus Desativados!",
                         style = MaterialTheme.typography.titleSmall,
-                        color = ViceDangerRed
+                        color = colors.danger
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = "Ativar qualquer cheat bloqueia salvamentos e conquistas/troféus na sessão até reiniciar o jogo. Sempre faça um save manual antes!",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ViceTextPrimary.copy(alpha = 0.9f)
+                        color = colors.textPrimary
                     )
                 }
             }
@@ -185,17 +192,17 @@ fun CheatsScreen(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Buscar cheat, veículo ou desafio...", color = ViceTextMuted) },
-                leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = ViceOceanCyan) },
+                placeholder = { Text("Buscar cheat, veículo ou desafio...", color = colors.textMuted) },
+                leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null, tint = colors.cyan) },
                 singleLine = true,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ViceOceanCyan,
-                    unfocusedBorderColor = ViceOutline,
-                    focusedContainerColor = ViceDeepSurface,
-                    unfocusedContainerColor = ViceDeepSurface,
-                    focusedTextColor = ViceTextPrimary,
-                    unfocusedTextColor = ViceTextPrimary
+                    focusedBorderColor = colors.cyan,
+                    unfocusedBorderColor = colors.outline,
+                    focusedContainerColor = colors.surface,
+                    unfocusedContainerColor = colors.surface,
+                    focusedTextColor = colors.textPrimary,
+                    unfocusedTextColor = colors.textPrimary
                 )
             )
 
@@ -209,7 +216,7 @@ fun CheatsScreen(
             ) {
                 CheatFilterChip(
                     label = "Todos (${GtaViCatalog.cheats.size})",
-                    accent = ViceOceanCyan,
+                    accent = colors.cyan,
                     selected = selectedCategory == null && !onlyFavorites,
                     onClick = {
                         selectedCategory = null
@@ -218,14 +225,14 @@ fun CheatsScreen(
                 )
                 CheatFilterChip(
                     label = "★ Favoritos (${state.favoriteCheatIds.size})",
-                    accent = ViceSunsetGold,
+                    accent = colors.gold,
                     selected = onlyFavorites,
                     onClick = { onlyFavorites = !onlyFavorites }
                 )
                 CheatCategory.entries.forEach { cat ->
                     CheatFilterChip(
                         label = cat.label,
-                        accent = cat.color,
+                        accent = cat.accent(colors),
                         selected = selectedCategory == cat,
                         onClick = {
                             selectedCategory = if (selectedCategory == cat) null else cat
@@ -242,7 +249,7 @@ fun CheatsScreen(
                     Text(
                         text = "Nenhum cheat encontrado para este filtro.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = ViceTextSecondary
+                        color = colors.textSecondary
                     )
                 }
             }
@@ -263,12 +270,17 @@ fun CheatsScreen(
 }
 
 @Composable
-private fun StepPill(text: String, color: Color, modifier: Modifier = Modifier) {
+private fun StepPill(
+    text: String,
+    color: Color,
+    bg: Color,
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(11.dp))
-            .background(color.copy(alpha = 0.14f))
-            .border(1.dp, color.copy(alpha = 0.45f), RoundedCornerShape(11.dp))
+            .background(bg)
+            .border(1.dp, color.copy(alpha = 0.5f), RoundedCornerShape(11.dp))
             .padding(horizontal = 8.dp, vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -288,18 +300,19 @@ private fun CheatFilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
+    val colors = LeonidaTheme.colors
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(if (selected) accent.copy(alpha = 0.2f) else ViceDeepSurface)
-            .border(1.dp, if (selected) accent else ViceOutline, RoundedCornerShape(12.dp))
+            .background(if (selected) accent.copy(alpha = if (colors.isDark) 0.2f else 0.13f) else colors.card)
+            .border(1.dp, if (selected) accent else colors.outline, RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp)
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = if (selected) accent else ViceTextSecondary
+            color = if (selected) accent else colors.textSecondary
         )
     }
 }
@@ -312,9 +325,12 @@ private fun CheatCodeCard(
     onToggleUnlocked: () -> Unit,
     onToggleFavorite: () -> Unit
 ) {
+    val colors = LeonidaTheme.colors
+    val catColor = cheat.category.accent(colors)
+
     ViceCard(
-        accentBorder = if (isUnlocked) VicePalmMint.copy(alpha = 0.5f) else cheat.category.color.copy(alpha = 0.35f),
-        backgroundColor = ViceCardSurface
+        accentBorder = if (isUnlocked) colors.mint.copy(alpha = 0.55f) else catColor.copy(alpha = 0.35f),
+        backgroundColor = colors.card
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -326,16 +342,16 @@ private fun CheatCodeCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                VicePillBadge(text = cheat.category.label, color = cheat.category.color)
+                VicePillBadge(text = cheat.category.label, color = catColor)
                 if (isUnlocked) {
-                    VicePillBadge(text = "DESBLOQUEADO", color = VicePalmMint)
+                    VicePillBadge(text = "DESBLOQUEADO", color = colors.mint)
                 }
             }
             IconButton(onClick = onToggleFavorite, modifier = Modifier.size(34.dp)) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Rounded.Star else Icons.Rounded.StarBorder,
                     contentDescription = "Favoritar cheat",
-                    tint = if (isFavorite) ViceSunsetGold else ViceTextMuted
+                    tint = if (isFavorite) colors.gold else colors.textMuted
                 )
             }
         }
@@ -344,14 +360,14 @@ private fun CheatCodeCard(
         Text(
             text = cheat.title,
             style = MaterialTheme.typography.titleMedium,
-            color = ViceTextPrimary,
+            color = colors.textPrimary,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(3.dp))
         Text(
             text = cheat.description,
             style = MaterialTheme.typography.bodySmall,
-            color = ViceTextSecondary
+            color = colors.textSecondary
         )
 
         Spacer(Modifier.height(12.dp))
@@ -363,27 +379,26 @@ private fun CheatCodeCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(ViceMidnight)
-                    .border(1.dp, ViceOutlineSoft, RoundedCornerShape(12.dp))
+                    .background(colors.chipBg)
+                    .border(1.dp, colors.outlineSoft, RoundedCornerShape(12.dp))
                     .padding(horizontal = 12.dp, vertical = 9.dp)
             ) {
                 Text(
                     text = "Sequência exibida em Progresso > Cheats assim que você concluir o requisito abaixo.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextMuted
+                    color = colors.textMuted
                 )
             }
         }
 
         Spacer(Modifier.height(12.dp))
 
-        // Unlock challenge box + toggle button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(14.dp))
-                .background(ViceDeepSurface)
-                .border(1.dp, ViceOutlineSoft, RoundedCornerShape(14.dp))
+                .background(colors.chipBg)
+                .border(1.dp, colors.outlineSoft, RoundedCornerShape(14.dp))
                 .padding(11.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -391,36 +406,36 @@ private fun CheatCodeCard(
             Icon(
                 imageVector = Icons.Rounded.LockOpen,
                 contentDescription = null,
-                tint = ViceSunsetGold,
+                tint = colors.gold,
                 modifier = Modifier.size(18.dp)
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Requisito de Desbloqueio",
                     style = MaterialTheme.typography.labelSmall,
-                    color = ViceSunsetGold
+                    color = colors.gold
                 )
                 Text(
                     text = cheat.unlockRequirement,
                     style = MaterialTheme.typography.bodySmall,
-                    color = ViceTextPrimary
+                    color = colors.textPrimary
                 )
                 cheat.extraNote?.let { note ->
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = note,
                         style = MaterialTheme.typography.bodySmall,
-                        color = ViceTextMuted
+                        color = colors.textMuted
                     )
                 }
             }
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (isUnlocked) VicePalmMint.copy(alpha = 0.2f) else ViceMidnight)
+                    .background(if (isUnlocked) colors.mintSoft else colors.card)
                     .border(
                         1.dp,
-                        if (isUnlocked) VicePalmMint else ViceOutline,
+                        if (isUnlocked) colors.mint else colors.outline,
                         RoundedCornerShape(10.dp)
                     )
                     .clickable(onClick = onToggleUnlocked)
@@ -433,13 +448,13 @@ private fun CheatCodeCard(
                     Icon(
                         imageVector = Icons.Rounded.CheckCircle,
                         contentDescription = null,
-                        tint = if (isUnlocked) VicePalmMint else ViceTextMuted,
+                        tint = if (isUnlocked) colors.mint else colors.textMuted,
                         modifier = Modifier.size(15.dp)
                     )
                     Text(
                         text = if (isUnlocked) "Feito" else "Marcar",
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (isUnlocked) VicePalmMint else ViceTextSecondary
+                        color = if (isUnlocked) colors.mint else colors.textSecondary
                     )
                 }
             }

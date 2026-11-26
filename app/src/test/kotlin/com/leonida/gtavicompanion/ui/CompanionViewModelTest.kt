@@ -8,8 +8,11 @@ import com.leonida.gtavicompanion.data.VersionComparator
 import com.leonida.gtavicompanion.model.PlatformType
 import com.leonida.gtavicompanion.model.SyncDetection
 import com.leonida.gtavicompanion.model.UserProgressState
+import com.leonida.gtavicompanion.ui.theme.DarkLeonidaColors
+import com.leonida.gtavicompanion.ui.theme.LightLeonidaColors
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -192,5 +195,16 @@ class CompanionViewModelTest {
         assertEquals(100, afterBoth.animalsStudiedCount)
         assertTrue("disc_animals" in afterBoth.completedChecklistIds)
         assertEquals(1, afterBoth.cameraScansCount)
+    }
+
+    @Test
+    fun lightAndDarkThemePalettesHaveDistinctAccessibleSurfaces() {
+        assertFalse(LightLeonidaColors.isDark)
+        assertTrue(DarkLeonidaColors.isDark)
+        assertNotEquals(LightLeonidaColors.background, DarkLeonidaColors.background)
+        assertNotEquals(LightLeonidaColors.card, DarkLeonidaColors.card)
+        assertNotEquals(LightLeonidaColors.textPrimary, DarkLeonidaColors.textPrimary)
+        assertNotEquals(LightLeonidaColors.silver, DarkLeonidaColors.silver)
+        assertNotEquals(LightLeonidaColors.mapOceanTop, DarkLeonidaColors.mapOceanTop)
     }
 }
