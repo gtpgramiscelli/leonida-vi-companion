@@ -185,6 +185,55 @@ data class CharacterProfile(
     val minChapter: Int
 )
 
+enum class TrophyTier(val label: String, val color: Color) {
+    PLATINUM("Platina", ViceOceanCyan),
+    GOLD("Ouro", ViceSunsetGold),
+    SILVER("Prata", Color(0xFFD4D8E8)),
+    BRONZE("Bronze", ViceSunsetOrange)
+}
+
+data class Ps5Trophy(
+    val id: String,
+    val nameEn: String,
+    val namePt: String,
+    val description: String,
+    val tier: TrophyTier,
+    val isHiddenStory: Boolean = false,
+    val minChapterVisible: Int = 0,
+    val grantsChapter: Int? = null,
+    val grantsChecklistIds: List<String> = emptyList(),
+    val grantsSecretIds: List<String> = emptyList(),
+    val grantsCheatIds: List<String> = emptyList(),
+    val minWainkCount: Int? = null,
+    val minShootingGoldCount: Int? = null
+)
+
+data class SyncDetection(
+    val sourceLabel: String,
+    val detectedChapter: Int? = null,
+    val detectedWaink: Int? = null,
+    val detectedAnimals: Int? = null,
+    val detectedStickUps: Int? = null,
+    val detectedShootingGold: Int? = null,
+    val detectedChecklistIds: Set<String> = emptySet(),
+    val detectedSecretIds: Set<String> = emptySet(),
+    val detectedCheatIds: Set<String> = emptySet(),
+    val detectedTrophyIds: Set<String> = emptySet(),
+    val highlights: List<String> = emptyList(),
+    val rawOcrText: String? = null
+) {
+    val hasAnySignal: Boolean
+        get() = detectedChapter != null ||
+            detectedWaink != null ||
+            detectedAnimals != null ||
+            detectedStickUps != null ||
+            detectedShootingGold != null ||
+            detectedChecklistIds.isNotEmpty() ||
+            detectedSecretIds.isNotEmpty() ||
+            detectedCheatIds.isNotEmpty() ||
+            detectedTrophyIds.isNotEmpty()
+}
+
 /**
  * Story progress level:
  * 0 = Ainda não comecei (Prólogo)
@@ -203,5 +252,10 @@ data class UserProgressState(
     val animalsStudiedCount: Int = 0,
     val stickUpsCount: Int = 0,
     val shootingGoldCount: Int = 0,
-    val githubRepo: String = ""
+    val githubRepo: String = "",
+    val psnOnlineId: String = "",
+    val unlockedTrophyIds: Set<String> = emptySet(),
+    val lastSyncSummary: String = "",
+    val lastSyncTimestampMs: Long = 0L,
+    val cameraScansCount: Int = 0
 )

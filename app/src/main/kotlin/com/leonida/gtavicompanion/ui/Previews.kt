@@ -35,7 +35,13 @@ private class PreviewProgressRepository(
 fun HomeScreenPreview() {
     val vm = CompanionViewModel(PreviewProgressRepository())
     LeonidaGuideTheme {
-        HomeScreen(state = vm.state.value, viewModel = vm, onOpenMap = {}, onOpenChapters = {})
+        HomeScreen(
+            state = vm.state.value,
+            viewModel = vm,
+            onOpenMap = {},
+            onOpenChapters = {},
+            onOpenSync = {}
+        )
     }
 }
 

@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.AutoStories
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Map
@@ -57,6 +58,7 @@ import com.leonida.gtavicompanion.ui.screens.CheatsScreen
 import com.leonida.gtavicompanion.ui.screens.ExtrasScreen
 import com.leonida.gtavicompanion.ui.screens.HomeScreen
 import com.leonida.gtavicompanion.ui.screens.MapScreen
+import com.leonida.gtavicompanion.ui.screens.SyncScreen
 import com.leonida.gtavicompanion.ui.theme.ViceDeepSurface
 import com.leonida.gtavicompanion.ui.theme.ViceMidnight
 import com.leonida.gtavicompanion.ui.theme.ViceNeonPink
@@ -84,9 +86,19 @@ fun LeonidaApp(viewModel: CompanionViewModel) {
     val updateState by viewModel.updateState.collectAsStateWithLifecycle()
     var currentTab by rememberSaveable { mutableStateOf(CompanionTab.HOME) }
     var showUpdateSheet by rememberSaveable { mutableStateOf(false) }
+    var showSyncScreen by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.checkForUpdateOnStartupIfConfigured()
+    }
+
+    if (showSyncScreen) {
+        SyncScreen(
+            state = state,
+            viewModel = viewModel,
+            onClose = { showSyncScreen = false }
+        )
+        return
     }
 
     val availableTag = when (val u = updateState) {
@@ -104,6 +116,7 @@ fun LeonidaApp(viewModel: CompanionViewModel) {
                 ViceTopHeader(
                     currentChapter = state.currentChapter,
                     hasUpdate = availableTag != null,
+                    onOpenSync = { showSyncScreen = true },
                     onOpenUpdateSheet = { showUpdateSheet = true }
                 )
                 AnimatedVisibility(visible = availableTag != null) {
@@ -190,7 +203,8 @@ fun LeonidaApp(viewModel: CompanionViewModel) {
                         state = state,
                         viewModel = viewModel,
                         onOpenMap = { currentTab = CompanionTab.MAP },
-                        onOpenChapters = { currentTab = CompanionTab.CHAPTERS }
+                        onOpenChapters = { currentTab = CompanionTab.CHAPTERS },
+                        onOpenSync = { showSyncScreen = true }
                     )
                     CompanionTab.MAP -> MapScreen(
                         state = state,
@@ -228,6 +242,7 @@ fun LeonidaApp(viewModel: CompanionViewModel) {
 private fun ViceTopHeader(
     currentChapter: Int,
     hasUpdate: Boolean,
+    onOpenSync: () -> Unit,
     onOpenUpdateSheet: () -> Unit
 ) {
     Column(
@@ -267,24 +282,33 @@ private fun ViceTopHeader(
                     color = ViceTextPrimary
                 )
                 Text(
-                    text = "Seu guia diário offline de GTA VI",
+                    text = when (currentChapter) {
+                        0 -> "Prólogo • Guia offline PS5"
+                        6 -> "Pós-Game • Rumo ao 100%"
+                        else -> "Capítulo $currentChapter • Guia offline PS5"
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = ViceTextMuted
                 )
             }
-            Box(
+            Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(ViceMidnight)
-                    .border(1.dp, ViceOutlineSoft, RoundedCornerShape(50))
-                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                    .background(ViceOceanCyan.copy(alpha = 0.14f))
+                    .border(1.dp, ViceOceanCyan.copy(alpha = 0.55f), RoundedCornerShape(50))
+                    .clickable(onClick = onOpenSync)
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Icon(
+                    imageVector = Icons.Rounded.CameraAlt,
+                    contentDescription = "Sincronizar PS5",
+                    tint = ViceOceanCyan,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(Modifier.width(5.dp))
                 Text(
-                    text = when (currentChapter) {
-                        0 -> "PRÓLOGO"
-                        6 -> "PÓS-GAME"
-                        else -> "CAP. $currentChapter"
-                    },
+                    text = "PS5 SYNC",
                     style = MaterialTheme.typography.labelSmall,
                     color = ViceOceanCyan
                 )

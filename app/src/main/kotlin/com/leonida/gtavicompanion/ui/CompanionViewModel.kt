@@ -1,17 +1,24 @@
 package com.leonida.gtavicompanion.ui
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.leonida.gtavicompanion.BuildConfig
+import com.leonida.gtavicompanion.data.GameScreenOcrParser
 import com.leonida.gtavicompanion.data.GitHubAppUpdater
 import com.leonida.gtavicompanion.data.GtaViCatalog
+import com.leonida.gtavicompanion.data.ImageOcrScanner
+import com.leonida.gtavicompanion.data.ProgressMerger
 import com.leonida.gtavicompanion.data.ProgressRepository
+import com.leonida.gtavicompanion.data.PsnProfileSyncClient
+import com.leonida.gtavicompanion.data.PsnSyncResult
 import com.leonida.gtavicompanion.data.ReleaseInfo
 import com.leonida.gtavicompanion.data.UpdateCheckResult
 import com.leonida.gtavicompanion.data.VersionComparator
 import com.leonida.gtavicompanion.model.PlatformType
+import com.leonida.gtavicompanion.model.SyncDetection
 import com.leonida.gtavicompanion.model.UserProgressState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,9 +42,23 @@ sealed interface UpdateUiState {
     data class Error(val message: String) : UpdateUiState
 }
 
+sealed interface SyncUiState {
+    data object Idle : SyncUiState
+    data object ScanningOcr : SyncUiState
+    data object SyncingPsn : SyncUiState
+    data class PreviewDetection(
+        val detection: SyncDetection,
+        val isCameraCapture: Boolean
+    ) : SyncUiState
+    data class AppliedSuccess(val title: String, val changes: List<String>) : SyncUiState
+    data class InfoMessage(val title: String, val message: String) : SyncUiState
+}
+
 class CompanionViewModel(
     private val repository: ProgressRepository,
-    private val updater: GitHubAppUpdater? = null
+    private val updater: GitHubAppUpdater? = null,
+    private val psnClient: PsnProfileSyncClient? = null,
+    private val ocrScanner: ImageOcrScanner? = null
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(repository.load())
@@ -48,11 +69,15 @@ class CompanionViewModel(
     )
     val updateState: StateFlow<UpdateUiState> = _updateState.asStateFlow()
 
+    private val _syncState = MutableStateFlow<SyncUiState>(SyncUiState.Idle)
+    val syncState: StateFlow<SyncUiState> = _syncState.asStateFlow()
+
     val currentAppVersion: String = BuildConfig.VERSION_NAME
     val totalChecklistCount: Int = GtaViCatalog.completionChecklist.size
     val totalSecretsCount: Int = GtaViCatalog.secretLocations.size
     val totalCheatsTrackedCount: Int = GtaViCatalog.cheats.size
     val totalFunFactsCount: Int = GtaViCatalog.funFacts.size
+    val totalMappedTrophiesCount: Int = GtaViCatalog.ps5Trophies.size
 
     private var didInitialAutoCheck = false
 
@@ -156,6 +181,112 @@ class CompanionViewModel(
         )
     }
 
+    // =========================================================================
+    // PS5 SYNC (PSN PUBLIC TROPHIES + TV CAMERA / PS APP OCR — CUMULATIVE)
+    // =========================================================================
+
+    fun savePsnIdAndSync(rawPsnId: String) {
+        val clean = rawPsnId.trim()
+        updateAndSave { it.copy(psnOnlineId = clean) }
+        val client = psnClient ?: return
+        _syncState.value = SyncUiState.SyncingPsn
+
+        viewModelScope.launch {
+            when (val res = client.syncPublicProfile(clean)) {
+                is PsnSyncResult.Success -> {
+                    applyDetectionInternal(res.detection, isCameraCapture = false)
+                }
+                is PsnSyncResult.FallbackNeeded -> {
+                    _syncState.value = SyncUiState.InfoMessage(res.title, res.message)
+                }
+            }
+        }
+    }
+
+    fun scanImageUri(uri: Uri, sourceLabel: String, isCameraCapture: Boolean) {
+        val scanner = ocrScanner ?: return
+        _syncState.value = SyncUiState.ScanningOcr
+
+        viewModelScope.launch {
+            val ocrResult = scanner.recognizeTextFromUri(uri)
+            ocrResult.fold(
+                onSuccess = { text ->
+                    val parsed = GameScreenOcrParser.parse(text, sourceLabel = sourceLabel)
+                    if (!parsed.hasAnySignal) {
+                        _syncState.value = SyncUiState.InfoMessage(
+                            title = "Nenhum dado de GTA VI reconhecido",
+                            message = "Não encontramos números de progresso ou nomes de troféus nítidos nessa imagem. Tente chegar um pouco mais perto da TV (60–100 cm), desligue o flash e enquadre o menu de Progresso/Estatísticas ou Troféus."
+                        )
+                    } else {
+                        _syncState.value = SyncUiState.PreviewDetection(
+                            detection = parsed,
+                            isCameraCapture = isCameraCapture
+                        )
+                    }
+                },
+                onFailure = { err ->
+                    _syncState.value = SyncUiState.InfoMessage(
+                        title = "Erro ao ler imagem",
+                        message = "Não foi possível processar a imagem (${err.message ?: "tente novamente"})."
+                    )
+                }
+            )
+        }
+    }
+
+    fun confirmAndApplyDetection(detection: SyncDetection, isCameraCapture: Boolean) {
+        applyDetectionInternal(detection, isCameraCapture)
+    }
+
+    private fun applyDetectionInternal(detection: SyncDetection, isCameraCapture: Boolean) {
+        var resultChanges: List<String> = emptyList()
+        updateAndSave { current ->
+            val merged = ProgressMerger.merge(
+                current = current,
+                detection = detection,
+                incrementCameraScanCount = isCameraCapture
+            )
+            resultChanges = merged.changesSummary
+            merged.updatedState
+        }
+        _syncState.value = SyncUiState.AppliedSuccess(
+            title = if (resultChanges.isEmpty()) {
+                "Leitura confirmada — você já estava em dia!"
+            } else {
+                "Progresso somado com sucesso!"
+            },
+            changes = resultChanges.ifEmpty {
+                listOf("Os dados detectados via ${detection.sourceLabel} já constavam no seu progresso atual.")
+            }
+        )
+    }
+
+    fun togglePs5Trophy(trophyId: String) {
+        val alreadyUnlocked = trophyId in _state.value.unlockedTrophyIds
+        if (alreadyUnlocked) {
+            updateAndSave { current ->
+                current.copy(unlockedTrophyIds = current.unlockedTrophyIds - trophyId)
+            }
+        } else {
+            val trophyName = GtaViCatalog.ps5Trophies.find { it.id == trophyId }?.nameEn ?: "Troféu PS5"
+            val detection = SyncDetection(
+                sourceLabel = "Troféu PS5 ($trophyName)",
+                detectedTrophyIds = setOf(trophyId)
+            )
+            updateAndSave { current ->
+                ProgressMerger.merge(current, detection).updatedState
+            }
+        }
+    }
+
+    fun dismissSyncFeedback() {
+        _syncState.value = SyncUiState.Idle
+    }
+
+    // =========================================================================
+    // STANDARD PROGRESS TRACKING
+    // =========================================================================
+
     fun completionFraction(current: UserProgressState = _state.value): Float {
         if (totalChecklistCount == 0) return 0f
         return (current.completedChecklistIds.size.toFloat() / totalChecklistCount).coerceIn(0f, 1f)
@@ -256,12 +387,14 @@ class CompanionViewModel(
     companion object {
         fun factory(
             repository: ProgressRepository,
-            updater: GitHubAppUpdater? = null
+            updater: GitHubAppUpdater? = null,
+            psnClient: PsnProfileSyncClient? = null,
+            ocrScanner: ImageOcrScanner? = null
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return CompanionViewModel(repository, updater) as T
+                    return CompanionViewModel(repository, updater, psnClient, ocrScanner) as T
                 }
             }
     }

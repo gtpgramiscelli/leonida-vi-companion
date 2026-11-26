@@ -12,9 +12,11 @@ import com.leonida.gtavicompanion.model.ChecklistItem
 import com.leonida.gtavicompanion.model.FunFact
 import com.leonida.gtavicompanion.model.GameplayTip
 import com.leonida.gtavicompanion.model.LeonidaRegion
+import com.leonida.gtavicompanion.model.Ps5Trophy
 import com.leonida.gtavicompanion.model.SecretCategory
 import com.leonida.gtavicompanion.model.SecretLocation
 import com.leonida.gtavicompanion.model.StoryChapter
+import com.leonida.gtavicompanion.model.TrophyTier
 
 object GtaViCatalog {
 
@@ -773,6 +775,198 @@ object GtaViCatalog {
             region = LeonidaRegion.VICE_CITY,
             bio = "Ambicioso aspirante a magnata da música em Vice City, conectado à cena urbana da metrópole e parceiro comercial de Boobie Ike na Only Raw Records.",
             minChapter = 3
+        )
+    )
+
+    // =========================================================================
+    // 8. TROFÉUS-CHAVE DO PS5 (DE 55 TOTAIS: 1 PLATINA, 2 OURO, 6 PRATA, 46 BRONZE)
+    // =========================================================================
+    val ps5Trophies: List<Ps5Trophy> = listOf(
+        // Marcos da História (Avançam o Capítulo & Escudo Anti-Spoiler!)
+        Ps5Trophy(
+            id = "trophy_just_like_paradise",
+            nameEn = "Just Like Paradise",
+            namePt = "Quase um Paraíso",
+            description = "Conclua 'Gone Fishing' no início do Capítulo 1.",
+            tier = TrophyTier.BRONZE,
+            isHiddenStory = true,
+            minChapterVisible = 0,
+            grantsChapter = 1
+        ),
+        Ps5Trophy(
+            id = "trophy_paradise_lost",
+            nameEn = "Paradise Lost",
+            namePt = "Paraíso Perdido",
+            description = "Conclua o Capítulo 1 nas Leonida Keys.",
+            tier = TrophyTier.BRONZE,
+            isHiddenStory = true,
+            minChapterVisible = 1,
+            grantsChapter = 2
+        ),
+        Ps5Trophy(
+            id = "trophy_tadm",
+            nameEn = "Tits Ass Drug Money",
+            namePt = "Grana, Crime e Vice",
+            description = "Conclua o Capítulo 2 em Port Gellhorn.",
+            tier = TrophyTier.BRONZE,
+            isHiddenStory = true,
+            minChapterVisible = 2,
+            grantsChapter = 3
+        ),
+        Ps5Trophy(
+            id = "trophy_vice_city_baby",
+            nameEn = "Vice City, Baby!",
+            namePt = "Vice City, Baby!",
+            description = "Conclua o Capítulo 3 em Vice City.",
+            tier = TrophyTier.BRONZE,
+            isHiddenStory = true,
+            minChapterVisible = 3,
+            grantsChapter = 4
+        ),
+        Ps5Trophy(
+            id = "trophy_top_world",
+            nameEn = "Top Of The World, Ma",
+            namePt = "No Topo do Mundo, Mãe!",
+            description = "Conclua o Capítulo 4.",
+            tier = TrophyTier.BRONZE,
+            isHiddenStory = true,
+            minChapterVisible = 4,
+            grantsChapter = 5
+        ),
+        Ps5Trophy(
+            id = "trophy_get_off",
+            nameEn = "You Gotta Know When to Get Off",
+            namePt = "Saber a Hora de Parar",
+            description = "Conclua a missão final da história principal (91 missões).",
+            tier = TrophyTier.GOLD,
+            isHiddenStory = true,
+            minChapterVisible = 5,
+            grantsChapter = 6,
+            grantsChecklistIds = listOf("story_main"),
+            grantsCheatIds = listOf(
+                "cheat_cash_250k",
+                "cheat_unlimited_focus",
+                "cheat_attack_force",
+                "cheat_cycle_weather"
+            )
+        ),
+
+        // Platina & 100%
+        Ps5Trophy(
+            id = "trophy_long_road",
+            nameEn = "A Long Road",
+            namePt = "Uma Longa Estrada",
+            description = "Alcance 100% de conclusão oficial em Grand Theft Auto VI.",
+            tier = TrophyTier.GOLD,
+            grantsChapter = 6,
+            grantsChecklistIds = listOf("story_main", "disc_regions")
+        ),
+        Ps5Trophy(
+            id = "trophy_vice_price",
+            nameEn = "Vice Got a Price!",
+            namePt = "Vice Tem um Preço!",
+            description = "Platina! Conquiste todos os outros 54 troféus de GTA VI no PS5.",
+            tier = TrophyTier.PLATINUM,
+            grantsChapter = 6
+        ),
+
+        // Prata (Metas Pesadas do 100%!)
+        Ps5Trophy(
+            id = "trophy_shootist",
+            nameEn = "The Shootist",
+            namePt = "Atirador de Elite",
+            description = "Conquiste medalha de Ouro em todos os desafios do Estande de Tiro (42/42).",
+            tier = TrophyTier.SILVER,
+            grantsChecklistIds = listOf("act_shooting"),
+            grantsCheatIds = listOf("cheat_max_ammo", "cheat_infinite_ammo", "cheat_no_reload"),
+            minShootingGoldCount = 42
+        ),
+        Ps5Trophy(
+            id = "trophy_wainker",
+            nameEn = "You WAiNKer!",
+            namePt = "Viciado em WAiNK!",
+            description = "Use o app WAiNK em 100 locais / veículos pelo estado de Leonida.",
+            tier = TrophyTier.SILVER,
+            minWainkCount = 100
+        ),
+        Ps5Trophy(
+            id = "trophy_cunning_stunts",
+            nameEn = "Cunning Stunts",
+            namePt = "Manobras Ousadas",
+            description = "Complete 250 manobras acrobáticas / saltos pelo mapa.",
+            tier = TrophyTier.SILVER,
+            grantsChecklistIds = listOf("act_stunts")
+        ),
+        Ps5Trophy(
+            id = "trophy_strangers",
+            nameEn = "Strangers & Freaks",
+            namePt = "Estranhos e Doidos",
+            description = "Complete 8 linhas completas de missões de estranhos em Leonida.",
+            tier = TrophyTier.SILVER
+        ),
+        Ps5Trophy(
+            id = "trophy_deck",
+            nameEn = "Don't Touch My Deck",
+            namePt = "Não Mexa no Meu Baralho",
+            description = "Complete 3 conjuntos de cartas colecionáveis.",
+            tier = TrophyTier.SILVER
+        ),
+        Ps5Trophy(
+            id = "trophy_max_withdrawal",
+            nameEn = "Maximum Withdrawal",
+            namePt = "Saque Máximo",
+            description = "Assalte 5 cofres de bancos e consiga escapar da polícia.",
+            tier = TrophyTier.SILVER
+        ),
+
+        // Bronze (Atividades, Corridas e Segredos!)
+        Ps5Trophy(
+            id = "trophy_truth_out_there",
+            nameEn = "The Truth Is Out There",
+            namePt = "A Verdade Está Lá Fora",
+            description = "Vivencie o encontro secreto da abdução OVNI em Kelly County (02:00–04:00).",
+            tier = TrophyTier.BRONZE,
+            isHiddenStory = false,
+            minChapterVisible = 2,
+            grantsSecretIds = listOf("sec_kelly_ufo")
+        ),
+        Ps5Trophy(
+            id = "trophy_top_fun",
+            nameEn = "Top Fun",
+            namePt = "Top Fun",
+            description = "Vença uma Corrida de Drone Top Fun em todos os locais.",
+            tier = TrophyTier.BRONZE,
+            grantsChecklistIds = listOf("act_drone")
+        ),
+        Ps5Trophy(
+            id = "trophy_earn_cash",
+            nameEn = "Earn Cash, Not Kudos",
+            namePt = "Dinheiro, Não Elogios",
+            description = "Vença 20 corridas diferentes por Leonida.",
+            tier = TrophyTier.BRONZE,
+            grantsChecklistIds = listOf("act_races")
+        ),
+        Ps5Trophy(
+            id = "trophy_stick_fiddler",
+            nameEn = "Stick Fiddler",
+            namePt = "Rei do Fliperama",
+            description = "Complete um jogo completo de fliperama.",
+            tier = TrophyTier.BRONZE,
+            grantsChecklistIds = listOf("act_arcade")
+        ),
+        Ps5Trophy(
+            id = "trophy_master_none",
+            nameEn = "Master of None",
+            namePt = "Pau pra Toda Obra",
+            description = "Experimente cada tipo de atividade paralela pelo menos uma vez.",
+            tier = TrophyTier.BRONZE
+        ),
+        Ps5Trophy(
+            id = "trophy_baited_tackle",
+            nameEn = "Baited My Tackle",
+            namePt = "Isca na Água",
+            description = "Vença Cal Hampton em um desafio de pesca.",
+            tier = TrophyTier.BRONZE
         )
     )
 }

@@ -11,8 +11,8 @@ android {
     applicationId = "com.leonida.gtavicompanion"
     minSdk = 26
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0.0"
+    versionCode = 2
+    versionName = "1.1.0"
 
     val defaultGithubRepo = (project.findProperty("leonida.githubRepo") as String?) ?: ""
     buildConfigField("String", "DEFAULT_GITHUB_REPO", "\"$defaultGithubRepo\"")
@@ -85,4 +85,11 @@ dependencies {
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.navigation3.runtime)
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+  // CameraX + Offline ML Kit OCR (TV Screen & PS App Screenshot Scanner)
+  implementation(libs.androidx.camera.core)
+  implementation(libs.androidx.camera.camera2)
+  implementation(libs.androidx.camera.lifecycle)
+  implementation(libs.androidx.camera.view)
+  implementation(libs.mlkit.text.recognition)
 }

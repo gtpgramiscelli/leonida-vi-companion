@@ -35,7 +35,12 @@ class SharedPrefsProgressRepository(context: Context) : ProgressRepository {
             shootingGoldCount = prefs.getInt(KEY_SHOOTING_GOLD_COUNT, 0).coerceIn(0, 42),
             githubRepo = prefs.getString(KEY_GITHUB_REPO, null)
                 ?.takeIf { it.isNotBlank() }
-                ?: BuildConfig.DEFAULT_GITHUB_REPO
+                ?: BuildConfig.DEFAULT_GITHUB_REPO,
+            psnOnlineId = prefs.getString(KEY_PSN_ID, "").orEmpty(),
+            unlockedTrophyIds = prefs.getStringSet(KEY_TROPHIES, emptySet()).orEmpty().toSet(),
+            lastSyncSummary = prefs.getString(KEY_LAST_SYNC_SUMMARY, "").orEmpty(),
+            lastSyncTimestampMs = prefs.getLong(KEY_LAST_SYNC_TS, 0L),
+            cameraScansCount = prefs.getInt(KEY_CAMERA_SCANS, 0).coerceAtLeast(0)
         )
     }
 
@@ -53,6 +58,11 @@ class SharedPrefsProgressRepository(context: Context) : ProgressRepository {
             .putInt(KEY_STICKUPS_COUNT, state.stickUpsCount)
             .putInt(KEY_SHOOTING_GOLD_COUNT, state.shootingGoldCount)
             .putString(KEY_GITHUB_REPO, state.githubRepo)
+            .putString(KEY_PSN_ID, state.psnOnlineId)
+            .putStringSet(KEY_TROPHIES, state.unlockedTrophyIds.toSet())
+            .putString(KEY_LAST_SYNC_SUMMARY, state.lastSyncSummary)
+            .putLong(KEY_LAST_SYNC_TS, state.lastSyncTimestampMs)
+            .putInt(KEY_CAMERA_SCANS, state.cameraScansCount)
             .apply()
     }
 
@@ -70,5 +80,10 @@ class SharedPrefsProgressRepository(context: Context) : ProgressRepository {
         const val KEY_STICKUPS_COUNT = "stickups_count"
         const val KEY_SHOOTING_GOLD_COUNT = "shooting_gold_count"
         const val KEY_GITHUB_REPO = "github_repo"
+        const val KEY_PSN_ID = "psn_id"
+        const val KEY_TROPHIES = "unlocked_trophies"
+        const val KEY_LAST_SYNC_SUMMARY = "last_sync_summary"
+        const val KEY_LAST_SYNC_TS = "last_sync_ts"
+        const val KEY_CAMERA_SCANS = "camera_scans_count"
     }
 }

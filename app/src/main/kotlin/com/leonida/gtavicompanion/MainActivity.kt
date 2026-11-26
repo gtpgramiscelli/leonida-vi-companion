@@ -8,6 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.leonida.gtavicompanion.data.GitHubAppUpdater
+import com.leonida.gtavicompanion.data.ImageOcrScanner
+import com.leonida.gtavicompanion.data.PsnProfileSyncClient
 import com.leonida.gtavicompanion.data.SharedPrefsProgressRepository
 import com.leonida.gtavicompanion.ui.CompanionViewModel
 import com.leonida.gtavicompanion.ui.LeonidaApp
@@ -24,11 +26,18 @@ class MainActivity : ComponentActivity() {
 
         val repository = SharedPrefsProgressRepository(applicationContext)
         val updater = GitHubAppUpdater(applicationContext)
+        val psnClient = PsnProfileSyncClient()
+        val ocrScanner = ImageOcrScanner(applicationContext)
 
         setContent {
             LeonidaGuideTheme {
                 val companionViewModel: CompanionViewModel = viewModel(
-                    factory = CompanionViewModel.factory(repository, updater)
+                    factory = CompanionViewModel.factory(
+                        repository = repository,
+                        updater = updater,
+                        psnClient = psnClient,
+                        ocrScanner = ocrScanner
+                    )
                 )
                 LeonidaApp(viewModel = companionViewModel)
             }

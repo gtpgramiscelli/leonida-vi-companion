@@ -25,7 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
@@ -95,7 +97,8 @@ fun HomeScreen(
     state: UserProgressState,
     viewModel: CompanionViewModel,
     onOpenMap: () -> Unit,
-    onOpenChapters: () -> Unit
+    onOpenChapters: () -> Unit,
+    onOpenSync: () -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf(ChecklistFilter.ALL) }
     var expandedCategories by remember {
@@ -220,6 +223,65 @@ fun HomeScreen(
                     currentChapter = state.currentChapter,
                     onSelectChapter = viewModel::setCurrentChapter
                 )
+            }
+        }
+
+        // 1.5 QUICK PS5 SYNC LAUNCHER CARD (Câmera na TV + Troféus PSN)
+        item {
+            ViceCard(
+                accentBorder = ViceOceanCyan.copy(alpha = 0.55f),
+                backgroundColor = ViceCardSurface,
+                onClick = onOpenSync
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(ViceOceanCyan.copy(alpha = 0.16f))
+                            .border(1.dp, ViceOceanCyan.copy(alpha = 0.55f), RoundedCornerShape(14.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.CameraAlt,
+                            contentDescription = null,
+                            tint = ViceOceanCyan,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = "Sincronizar com PS5",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = ViceTextPrimary
+                            )
+                            VicePillBadge(text = "CÂMERA + PSN", color = ViceOceanCyan)
+                        }
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = if (state.lastSyncSummary.isNotBlank()) {
+                                state.lastSyncSummary
+                            } else {
+                                "Aponte para a TV, importe prints do PS App ou sincronize troféus PSN."
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (state.lastSyncSummary.isNotBlank()) VicePalmMint else ViceTextSecondary
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Rounded.ChevronRight,
+                        contentDescription = null,
+                        tint = ViceOceanCyan
+                    )
+                }
             }
         }
 
